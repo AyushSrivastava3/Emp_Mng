@@ -40,20 +40,70 @@ public class UserController {
     JwtUtil jwtUtil;
 
     private static final PasswordEncoder passwordencoder=new BCryptPasswordEncoder();
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginUser(@RequestBody User user) {
+//
+//        try{
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+//            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+//            return new ResponseEntity<>(jwt, HttpStatus.OK);
+//        }catch (Exception e){
+//            log.error("Exception occurred while createAuthenticationToken ", e);
+//            return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginUser(@RequestBody User user) {
+//        try {
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+//
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+//
+//            // Fetch the role from the user repository
+//            User dbUser = userRepository.findByUsername(user.getUsername());  // Fetch user details from DB
+//            String role = String.valueOf(dbUser.getRole());  // Assuming User entity has a `role` field
+//
+//            String jwt = jwtUtil.generateToken(userDetails.getUsername(), role);
+//            return new ResponseEntity<>(jwt, HttpStatus.OK);
+//        } catch (Exception e) {
+//            log.error("Exception occurred while creating Authentication Token", e);
+//            return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user) {
-
-        try{
+        try {
+            // Authenticate user with provided username and password
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+
+            // Fetch the user from the database
+            User dbUser = userRepository.findByUsername(user.getUsername());
+            if (dbUser == null) {
+                // Return error if user is not found in the database
+                return new ResponseEntity<>("User not found", HttpStatus.BAD_REQUEST);
+            }
+
+            // Get the role from the database user and userId
+            String role = String.valueOf(dbUser.getRole());
+            Integer userId = dbUser.getId();  // Assuming User entity has a getId method that returns userId
+            String email= dbUser.getEmail();
+            // Generate JWT with username, role, and userId
+            String jwt = jwtUtil.generateToken(dbUser.getUsername(), role,userId,email);  // Modified to include userId
+
             return new ResponseEntity<>(jwt, HttpStatus.OK);
-        }catch (Exception e){
-            log.error("Exception occurred while createAuthenticationToken ", e);
+        } catch (Exception e) {
+            log.error("Exception occurred while creating Authentication Token", e);
             return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
 
     @PostMapping("/register")
@@ -68,6 +118,7 @@ public class UserController {
         newUser.setEmail(user.getEmail());
         newUser.setUsername(user.getUsername());
         //user.setPassword(user.getPassword());
+        newUser.setRole(user.getRole());
         newUser.setPassword(passwordencoder.encode(user.getPassword()));
         // Save the user to the database
         userRepository.save(newUser);

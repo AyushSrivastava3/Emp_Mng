@@ -36,8 +36,8 @@ public class EmployeeClientInfo {
     private LocalDate joiningDateToClient;
     private LocalDate endDate;
     private Integer workingHours;
-    @OneToMany(mappedBy = "employeeClientInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Leave> leaves = new ArrayList<>();
+//    @OneToMany(mappedBy = "employeeClientInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Leave> leaves = new ArrayList<>();
 
     @ElementCollection
     private List<LocalDate> leaveDays = new ArrayList<>();

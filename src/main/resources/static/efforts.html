@@ -155,7 +155,7 @@
 
 <!--    // Fetch all clients-->
 <!--    async function fetchClients() {-->
-<!--        const response = await fetch('http://3.6.108.76:8080/api/clients');-->
+<!--        const response = await fetch('http://localhost:8080/api/clients');-->
 <!--        const clients = await response.json();-->
 <!--        clientSelect.innerHTML = '<option value="">Select a client</option>';-->
 <!--        clients.forEach(client => {-->
@@ -176,7 +176,7 @@
 <!--            return;-->
 <!--        }-->
 
-<!--        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/employeesForClientInMonth?clientId=${clientId}&yearMonth=${yearMonth}`);-->
+<!--        const response = await fetch(`http://localhost:8080/employeeClientInfo/employeesForClientInMonth?clientId=${clientId}&yearMonth=${yearMonth}`);-->
 <!--        if (response.ok) {-->
 <!--            const resources = await response.json();-->
 <!--            renderResources(resources);-->
@@ -273,7 +273,7 @@
 <!--        };-->
 
 <!--        // Send the request to the backend with resourceId as query param-->
-<!--        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/updateDays?infoId=${resourceId}`, {-->
+<!--        const response = await fetch(`http://localhost:8080/employeeClientInfo/updateDays?infoId=${resourceId}`, {-->
 <!--            method: 'POST',-->
 <!--            headers: {-->
 <!--                'Content-Type': 'application/json'-->
@@ -461,7 +461,7 @@ footer {
 
     // Fetch all clients
     async function fetchClients() {
-        const response = await fetch('http://3.6.108.76:8080/api/clients');
+        const response = await fetch('http://localhost:8080/api/clients');
         const clients = await response.json();
         clientSelect.innerHTML = '<option value="">Select a client</option>';
         clients.forEach(client => {
@@ -482,7 +482,7 @@ footer {
             return;
         }
 
-        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/employeesForClientInMonth?clientId=${clientId}&yearMonth=${yearMonth}`);
+        const response = await fetch(`http://localhost:8080/employeeClientInfo/employeesForClientInMonth?clientId=${clientId}&yearMonth=${yearMonth}`);
         if (response.ok) {
             const resources = await response.json();
             renderResources(resources);
@@ -582,7 +582,7 @@ async function saveDays(resourceId) {
     };
 
     // Send the request to the backend
-    const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/updateDays?infoId=${resourceId}`, {
+    const response = await fetch(`http://localhost:8080/employeeClientInfo/updateDays?infoId=${resourceId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

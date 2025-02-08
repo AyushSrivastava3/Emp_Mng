@@ -1,9 +1,7 @@
 package com.dq.empportal.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.dq.empportal.enums.Role;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -21,5 +19,7 @@ public class User {
 
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role; // Added role field
 
 }

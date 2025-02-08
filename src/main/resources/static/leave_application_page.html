@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Application</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Custom scrollbar for table container */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Custom scrollbar color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+
+        html, body {
+  height: 100%; /* Ensure full height */
+  margin: 0; /* Remove default margins */
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Make the body a flex container */
+}
+
+.container {
+  flex-grow: 1; /* Allow the content to expand and fill available space */
+}
+
+footer {
+            margin-top: auto;
+        }
+         /* Stylish spinner container */
+        .spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+
+        /* Modern Stylish Spinner */
+        .stylish-spinner {
+            width: 64px;
+            height: 64px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pulsating effect */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+<div id="navbar"></div>
+<!-- Spinner Container -->
+<div id="spinner-container" class="spinner-container">
+    <div class="stylish-spinner"></div>
+</div>
+<div class="w-full mx-auto p-8 bg-white shadow-lg rounded-lg ">
+    <h2 class="flex justify-center items-center text-2xl font-bold mb-4 text-gray-700">Leave Application</h2>
+
+    <!-- Employee Details -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+            <label class="block text-gray-700 font-medium">Employee Name</label>
+            <input type="text" id="empName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
+        </div>
+        <div>
+            <label class="block text-gray-700 font-medium">Employee ID</label>
+            <input type="text" id="empID" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
+        </div>
+        <div>
+            <label class="block text-gray-700 font-medium">Client</label>
+            <input type="text" id="client" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
+        </div>
+        <div>
+            <label class="block text-gray-700 font-medium">Designation</label>
+            <input type="text" id="designation" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
+        </div>
+        <div>
+            <label class="block text-gray-700 font-medium">Date of Joining</label>
+            <input type="text" id="doj" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
+        </div>
+    </div>
+
+    <!-- Leave Application -->
+    <div class="mb-6">
+        <label class="block text-gray-700 font-medium">Leave Type</label>
+        <select id="leaveType" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+            <option value="">Select Leave Type</option>
+            <option value="sick">Sick Leave</option>
+            <option value="annual">Annual Leave</option>
+            <option value="holiday">Holiday</option>
+            <option value="comp_off">Comp Off</option>
+            <option value="unpaid">Unpaid Leave</option>
+        </select>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+            <label class="block text-gray-700 font-medium">Leave From</label>
+            <input type="date" id="leaveFrom" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+        </div>
+        <div>
+            <label class="block text-gray-700 font-medium">Leave To</label>
+            <input type="date" id="leaveTo" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <label class="block text-gray-700 font-medium">Number of Leaves</label>
+        <input type="number" id="leaveDays" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100" readonly>
+    </div>
+
+    <div class="mb-6">
+        <label class="block text-gray-700 font-medium">Reason / Comments</label>
+        <textarea id="reason" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" rows="4"></textarea>
+    </div>
+
+    <button onclick="submitLeaveApplication()" class="bg-indigo-600 text-white px-4 py-2 rounded-md shadow hover:bg-indigo-700">Submit Application</button>
+</div>
+<!-- Include Footer -->
+<footer id="footer"></footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    // Simulate content loading with a timeout
+    setTimeout(function() {
+        document.getElementById("spinner-container").style.display = "none";  // Hide spinner after loading
+    }, 1100); // Adjust the delay based on your requirements
+});
+
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+
+fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('footer').innerHTML = data;
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+<!--        console.log("params :",params);-->
+<!--        const params = new URLSearchParams(window.location.search);-->
+
+    console.log("URL Parameters:", params.toString());
+
+    const clientsParam = params.get("client");
+    if (clientsParam) {
+        try {
+            const clients = JSON.parse(clientsParam);
+            console.log("Clients:", clients);
+
+            // Display clients
+            const clientNames = clients.map(client => client.clientName).join(", ");
+            document.getElementById("client").value = clientNames;
+        } catch (error) {
+            console.error("Error parsing clients:", error);
+        }
+    } else {
+        console.log("No clients found in URL.");
+    }
+        document.getElementById("empName").value = params.get("name") || "";
+        document.getElementById("empID").value = params.get("id") || "";
+<!--        document.getElementById("client").value = params.get("client") || "";-->
+        document.getElementById("designation").value = params.get("designation") || "";
+        document.getElementById("doj").value = params.get("doj") || "";
+
+
+        // Auto-calculate number of leave days
+        document.getElementById("leaveFrom").addEventListener("change", calculateLeaveDays);
+        document.getElementById("leaveTo").addEventListener("change", calculateLeaveDays);
+    });
+
+    function calculateLeaveDays() {
+        const fromDate = new Date(document.getElementById("leaveFrom").value);
+        const toDate = new Date(document.getElementById("leaveTo").value);
+
+        if (!isNaN(fromDate) && !isNaN(toDate) && toDate >= fromDate) {
+            const days = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById("leaveDays").value = days;
+        } else {
+            document.getElementById("leaveDays").value = "";
+        }
+    }
+    async function submitLeaveApplication() {
+    const leaveData = {
+        employeeId: document.getElementById("empID").value, // Map to LeaveRequest field
+        employeeName: document.getElementById("empName").value,
+        startDate: document.getElementById("leaveFrom").value, // Map to LeaveRequest field
+        endDate: document.getElementById("leaveTo").value,    // Map to LeaveRequest field
+        type: document.getElementById("leaveType").value,     // Map to LeaveRequest field
+        reason: document.getElementById("reason").value,      // Map to LeaveRequest field
+    };
+
+    console.log("Submitting Leave Application:", leaveData);
+
+    try {
+        const response = await fetch('http://localhost:8080/api/leaves/submitLeave', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Ensure the backend receives JSON
+            },
+            body: JSON.stringify(leaveData), // Send leaveData as JSON
+        });
+
+        if (response.ok) {
+            const result = await response.text(); // Parse response as text
+            // Use SweetAlert to display success message
+            swal.fire({
+                icon: 'success',
+                title: 'Leave Application Submitted!',
+                text: `${result} An email notification has also been sent to HR.`,
+            });
+            console.log("API Response:", result);
+        } else {
+            const error = await response.json();
+            // Use SweetAlert to display error message
+            swal.fire({
+                icon: 'error',
+                title: 'Submission Failed',
+                text: "Failed to submit leave application. Error: " + (error.message || response.statusText),
+            });
+            console.error("Error:", error);
+        }
+    } catch (err) {
+        // Use SweetAlert to display a generic error message
+        swal.fire({
+            icon: 'error',
+            title: 'An Error Occurred',
+            text: 'An error occurred while submitting the leave application. Please try again.',
+        });
+        console.error("Error:", err);
+    }
+}
+
+</script>
+<script src="navbar.js"></script>
+</body>
+</html>

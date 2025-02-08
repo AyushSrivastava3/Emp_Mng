@@ -1,0 +1,737 @@
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Task Details</title>-->
+<!--    &lt;!&ndash; Tailwind CSS &ndash;&gt;-->
+<!--    <script src="https://cdn.tailwindcss.com"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
+
+<!--    <style>-->
+<!--        /* Custom scrollbar for table container */-->
+<!--        ::-webkit-scrollbar {-->
+<!--            width: 8px;-->
+<!--            height: 8px;-->
+<!--        }-->
+<!--        ::-webkit-scrollbar-thumb {-->
+<!--            background-color: #4f46e5; /* Custom scrollbar color */-->
+<!--            border-radius: 4px;-->
+<!--        }-->
+<!--        ::-webkit-scrollbar-track {-->
+<!--            background: #f3f4f6;-->
+<!--        }-->
+
+<!--        html, body {-->
+<!--  height: 100%; /* Ensure full height */-->
+<!--  margin: 0; /* Remove default margins */-->
+<!--}-->
+
+<!--body {-->
+<!--  display: flex;-->
+<!--  flex-direction: column; /* Make the body a flex container */-->
+<!--}-->
+
+<!--.container {-->
+<!--  flex-grow: 1; /* Allow the content to expand and fill available space */-->
+<!--}-->
+
+<!--footer {-->
+<!--            margin-top: auto;-->
+<!--        }-->
+<!--         /* Stylish spinner container */-->
+<!--        .spinner-container {-->
+<!--            position: fixed;-->
+<!--            top: 0;-->
+<!--            left: 0;-->
+<!--            width: 100vw;-->
+<!--            height: 100vh;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            background-color: #ffffff;-->
+<!--            z-index: 1000;-->
+<!--        }-->
+
+<!--        /* Modern Stylish Spinner */-->
+<!--        .stylish-spinner {-->
+<!--            width: 64px;-->
+<!--            height: 64px;-->
+<!--            border: 8px solid rgba(0, 0, 0, 0.1);-->
+<!--            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */-->
+<!--            border-radius: 50%;-->
+<!--            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;-->
+<!--        }-->
+
+<!--        /* Spinner Animation */-->
+<!--        @keyframes spin {-->
+<!--            0% {-->
+<!--                transform: rotate(0deg);-->
+<!--            }-->
+<!--            100% {-->
+<!--                transform: rotate(360deg);-->
+<!--            }-->
+<!--        }-->
+
+<!--        /* Pulsating effect */-->
+<!--        @keyframes pulse {-->
+<!--            0%, 100% {-->
+<!--                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);-->
+<!--            }-->
+<!--            50% {-->
+<!--                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body class="bg-gray-100 font-sans">-->
+<!--&lt;!&ndash; Page content &ndash;&gt;-->
+<!--<div id="navbar"></div>-->
+<!--&lt;!&ndash; Spinner Container &ndash;&gt;-->
+<!--<div id="spinner-container" class="spinner-container">-->
+<!--    <div class="stylish-spinner"></div>-->
+<!--</div>-->
+<!--<div class="w-full mx-auto p-6 bg-white shadow-md rounded-lg">-->
+<!--    <h1 class="text-4xl font-bold text-center mb-2">Task Details</h1>-->
+
+<!--    &lt;!&ndash; Task Details &ndash;&gt;-->
+<!--    <div class="bg-white p-6 rounded-lg shadow-md">-->
+<!--        <div class="mb-4">-->
+<!--            <p><strong class="text-lg">Employee ID:</strong> <span id="employeeId" class="text-gray-700"></span></p>-->
+<!--            <p><strong class="text-lg">Week Start Date:</strong> <span id="weekStartDate" class="text-gray-700"></span></p>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Task Table &ndash;&gt;-->
+<!--        <table id="tasksTable" class="w-full table-auto mt-4">-->
+<!--            <thead class="bg-gray-200 text-gray-700">-->
+<!--            <tr>-->
+<!--                <th class="px-4 py-2 border-b">Task Description</th>-->
+<!--                <th class="px-4 py-2 border-b">Monday</th>-->
+<!--                <th class="px-4 py-2 border-b">Tuesday</th>-->
+<!--                <th class="px-4 py-2 border-b">Wednesday</th>-->
+<!--                <th class="px-4 py-2 border-b">Thursday</th>-->
+<!--                <th class="px-4 py-2 border-b">Friday</th>-->
+<!--                <th class="px-4 py-2 border-b">Saturday</th>-->
+<!--                <th class="px-4 py-2 border-b">Sunday</th>-->
+<!--            </tr>-->
+<!--            </thead>-->
+<!--            <tbody id="tasksTableBody">-->
+<!--            &lt;!&ndash; Tasks will be dynamically added here &ndash;&gt;-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Approve Button &ndash;&gt;-->
+<!--    <button id="approveButton" class="mt-6 bg-green-500 text-white py-2 px-4 rounded-lg float-right hover:bg-green-600">Approve</button>-->
+<!--</div>-->
+<!--&lt;!&ndash; Include Footer &ndash;&gt;-->
+<!--<footer id="footer"></footer>-->
+<!--<script>-->
+<!--    // Show the spinner for a few seconds while loading content-->
+<!--document.addEventListener("DOMContentLoaded", function() {-->
+<!--    // Simulate content loading with a timeout-->
+<!--    setTimeout(function() {-->
+<!--        document.getElementById("spinner-container").style.display = "none";  // Hide spinner after loading-->
+<!--    }, 1100); // Adjust the delay based on your requirements-->
+<!--});-->
+
+<!--fetch('navbar.html')-->
+<!--    .then(response => response.text())-->
+<!--    .then(data => {-->
+<!--        document.getElementById('navbar').innerHTML = data;-->
+<!--    });-->
+
+<!--fetch('footer.html')-->
+<!--    .then(response => response.text())-->
+<!--    .then(data => {-->
+<!--        document.getElementById('footer').innerHTML = data;-->
+<!--    });-->
+<!--    // Declare leaveDays globally-->
+<!--    let leaveDays = [];-->
+
+<!--    // Function to extract employeeId and weekStartDate from URL parameters-->
+<!--    function getUrlParams() {-->
+<!--        const urlParams = new URLSearchParams(window.location.search);-->
+<!--        const employeeId = urlParams.get('employeeId');-->
+<!--        const weekStartDate = urlParams.get('weekStartDate');-->
+<!--        const timesheetId=urlParams.get('timesheetId');-->
+<!--        return { employeeId, weekStartDate ,timesheetId};-->
+<!--    }-->
+
+<!--    // Fetch leave days-->
+<!--    async function fetchLeaveDays(employeeId) {-->
+<!--        const apiUrl = `http://localhost:8080/api/leaves/${employeeId}`;-->
+<!--        try {-->
+<!--            const response = await fetch(apiUrl);-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error("Failed to fetch leave data");-->
+<!--            }-->
+<!--            leaveDays = await response.json(); // Assuming the API returns an array of leave dates-->
+<!--            console.log("Fetched leave days:", leaveDays);-->
+<!--        } catch (error) {-->
+<!--            console.error("Error fetching leave data:", error);-->
+<!--            alert("Failed to fetch leave data. Please try again.");-->
+<!--        }-->
+<!--    }-->
+
+<!--function generateTaskTable(timesheet, weekStartDate) {-->
+<!--    const tasks = timesheet.tasks;-->
+<!--    const table = document.querySelector("#tasksTableBody");-->
+<!--    table.innerHTML = "";-->
+
+<!--    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];-->
+<!--    const weekStart = new Date(weekStartDate);-->
+
+<!--    // Map week days to their actual dates-->
+<!--    const weekDates = daysOfWeek.map((_, index) => {-->
+<!--        const date = new Date(weekStart);-->
+<!--        date.setDate(weekStart.getDate() + index);-->
+<!--        return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"-->
+<!--    });-->
+
+<!--    // Identify leave days within the selected week and their statuses-->
+<!--    const leaveDaysInWeek = {};-->
+<!--    leaveDays.forEach(leave => {-->
+<!--        const leaveStart = new Date(leave.startDate);-->
+<!--        const leaveEnd = new Date(leave.endDate);-->
+
+<!--        weekDates.forEach(date => {-->
+<!--            const currentDate = new Date(date);-->
+<!--            if (currentDate >= leaveStart && currentDate <= leaveEnd) {-->
+<!--                leaveDaysInWeek[date] = leave.status;-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+<!--    tasks.forEach(task => {-->
+<!--        const row = document.createElement("tr");-->
+
+<!--        let taskRow = `<td class="px-4 py-2 text-center border-b">${task.taskDescription || "N/A"}</td>`;-->
+
+<!--        const hoursPerDay = {-->
+<!--            monday: "",-->
+<!--            tuesday: "",-->
+<!--            wednesday: "",-->
+<!--            thursday: "",-->
+<!--            friday: "",-->
+<!--            saturday: "",-->
+<!--            sunday: ""-->
+<!--        };-->
+
+<!--        if (task.dateHoursMap) {-->
+<!--            Object.keys(task.dateHoursMap).forEach(date => {-->
+<!--                const dateObj = new Date(date);-->
+<!--                const dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" }).toLowerCase();-->
+<!--                if (hoursPerDay[dayOfWeek] !== undefined) {-->
+<!--                    hoursPerDay[dayOfWeek] = task.dateHoursMap[date] || "0";-->
+<!--                }-->
+<!--            });-->
+<!--        }-->
+
+<!--        // Add non-editable cells for each day-->
+<!--        daysOfWeek.forEach((day, index) => {-->
+<!--            const date = weekDates[index];-->
+<!--            const leaveStatus = leaveDaysInWeek[date];-->
+<!--            let dayStyle = "";-->
+
+<!--            if (leaveStatus === "Pending") {-->
+<!--                dayStyle = 'bg-red-500 text-white';-->
+<!--            } else if (leaveStatus === "Approved") {-->
+<!--                dayStyle = 'bg-black text-white';-->
+<!--            }-->
+
+<!--            taskRow += `<td class="px-4 py-2 text-center border-b ${dayStyle}"><span>${hoursPerDay[day] || "0"}</span></td>`;-->
+<!--        });-->
+
+<!--        row.innerHTML = taskRow;-->
+<!--        table.appendChild(row);-->
+<!--    });-->
+<!--}-->
+
+
+<!--    // Fetch timesheet data based on employeeId and weekStartDate-->
+<!--    async function fetchTimesheetData(employeeId, weekStartDate) {-->
+<!--        const apiUrl = `http://localhost:8080/api/timesheets/${employeeId}/${weekStartDate}`;-->
+<!--        try {-->
+<!--            const response = await fetch(apiUrl);-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error("Failed to fetch timesheet data");-->
+<!--            }-->
+
+<!--            const timesheet = await response.json();-->
+<!--            console.log("Fetched timesheet:", timesheet); // Debugging-->
+
+<!--            // Check if tasks exist and iterate-->
+<!--            if (timesheet.tasks && timesheet.tasks.length > 0) {-->
+<!--                generateTaskTable(timesheet, weekStartDate);-->
+<!--            } else {-->
+<!--                console.error("No tasks available for the selected timesheet.");-->
+<!--                alert("No tasks available for the selected week.");-->
+<!--            }-->
+<!--        } catch (error) {-->
+<!--            console.error("Error fetching timesheet:", error);-->
+<!--            alert("Failed to fetch timesheet data. Please try again.");-->
+<!--        }-->
+<!--    }-->
+
+<!--async function approveTimesheet() {-->
+<!--    const apiUrl = `http://localhost:8080/api/timesheets/${timesheetId}/approval`;-->
+<!--    const requestBody = new URLSearchParams({ approvalStatus: "Approved" });-->
+
+<!--    try {-->
+<!--        const response = await fetch(apiUrl, {-->
+<!--            method: "PUT",-->
+<!--            headers: {-->
+<!--                "Content-Type": "application/x-www-form-urlencoded",-->
+<!--            },-->
+<!--            body: requestBody,-->
+<!--        });-->
+
+<!--        if (!response.ok) {-->
+<!--            throw new Error("Failed to approve timesheet");-->
+<!--        }-->
+
+<!--        const updatedTimesheet = await response.json();-->
+<!--        console.log("Timesheet approved successfully:", updatedTimesheet);-->
+
+<!--        // SweetAlert for success message-->
+<!--        Swal.fire({-->
+<!--            title: "Success!",-->
+<!--            text: "Timesheet approved successfully!",-->
+<!--            icon: "success",-->
+<!--            confirmButtonText: "OK",-->
+<!--        });-->
+<!--    } catch (error) {-->
+<!--        console.error("Error approving timesheet:", error);-->
+
+<!--        // SweetAlert for error message-->
+<!--        Swal.fire({-->
+<!--            title: "Error!",-->
+<!--            text: "Failed to approve timesheet. Please try again.",-->
+<!--            icon: "error",-->
+<!--            confirmButtonText: "OK",-->
+<!--        });-->
+<!--    }-->
+<!--}-->
+
+
+
+<!--    // Get employeeId and weekStartDate from URL parameters-->
+<!--    const { employeeId, weekStartDate, timesheetId } = getUrlParams();-->
+
+<!--    // Set Employee ID and Week Start Date in the page-->
+<!--    document.getElementById("employeeId").textContent = employeeId;-->
+<!--    document.getElementById("weekStartDate").textContent = weekStartDate;-->
+
+<!--    // Fetch leave days and then fetch timesheet data-->
+<!--    fetchLeaveDays(employeeId).then(() => {-->
+<!--        // After leave days are fetched, fetch timesheet data-->
+<!--        fetchTimesheetData(employeeId, weekStartDate);-->
+<!--    });-->
+
+<!--    document.getElementById("approveButton").addEventListener("click", approveTimesheet);-->
+
+<!--</script>-->
+<!--<script src="navbar.js"></script>-->
+
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        /* Custom scrollbar for table container */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Custom scrollbar color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+
+        html, body {
+            height: 100%; /* Ensure full height */
+            margin: 0; /* Remove default margins */
+        }
+
+        body {
+            display: flex;
+            flex-direction: column; /* Make the body a flex container */
+        }
+
+        .container {
+            flex-grow: 1; /* Allow the content to expand and fill available space */
+        }
+
+        footer {
+            margin-top: auto;
+        }
+
+        /* Stylish spinner container */
+        .spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+
+        /* Modern Stylish Spinner */
+        .stylish-spinner {
+            width: 64px;
+            height: 64px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pulsating effect */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+<!-- Page content -->
+<div id="navbar"></div>
+<!-- Spinner Container -->
+<div id="spinner-container" class="spinner-container">
+    <div class="stylish-spinner"></div>
+</div>
+<div class="w-full mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-4xl font-bold text-center mb-2">Task Details</h1>
+
+    <!-- Date Picker for Week Start Date -->
+    <div class="mb-4">
+        <label for="weekStartDatePicker" class="block text-lg font-medium text-gray-700">Select Week Start Date (Monday):</label>
+        <input type="text" id="weekStartDatePicker" class="mt-1 p-2 border rounded-lg w-full">
+    </div>
+
+    <!-- Task Details -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-4">
+            <p><strong class="text-lg">Employee ID:</strong> <span id="employeeId" class="text-gray-700"></span></p>
+            <p><strong class="text-lg">Week Start Date:</strong> <span id="weekStartDate" class="text-gray-700"></span></p>
+        </div>
+
+        <!-- Task Table -->
+        <table id="tasksTable" class="w-full table-auto mt-4">
+            <thead class="bg-gray-200 text-gray-700">
+            <tr>
+                <th class="px-4 py-2 border-b">Task Description</th>
+                <th class="px-4 py-2 border-b">Monday</th>
+                <th class="px-4 py-2 border-b">Tuesday</th>
+                <th class="px-4 py-2 border-b">Wednesday</th>
+                <th class="px-4 py-2 border-b">Thursday</th>
+                <th class="px-4 py-2 border-b">Friday</th>
+                <th class="px-4 py-2 border-b">Saturday</th>
+                <th class="px-4 py-2 border-b">Sunday</th>
+            </tr>
+            </thead>
+            <tbody id="tasksTableBody">
+            <!-- Tasks will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Approve Button -->
+    <button id="approveButton" class="mt-6 bg-green-500 text-white py-2 px-4 rounded-lg float-right hover:bg-green-600">Approve</button>
+</div>
+<!-- Include Footer -->
+<footer id="footer"></footer>
+
+<script>
+    // Show the spinner for a few seconds while loading content
+    document.addEventListener("DOMContentLoaded", function () {
+        // Simulate content loading with a timeout
+        setTimeout(function () {
+            document.getElementById("spinner-container").style.display = "none"; // Hide spinner after loading
+        }, 1100); // Adjust the delay based on your requirements
+    });
+
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+
+    // Declare leaveDays globally
+    let leaveDays = [];
+
+    // Function to extract employeeId and weekStartDate from URL parameters
+    function getUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const employeeId = urlParams.get('employeeId');
+        const weekStartDate = urlParams.get('weekStartDate');
+        const timesheetId = urlParams.get('timesheetId');
+        return { employeeId, weekStartDate, timesheetId };
+    }
+
+    // Fetch leave days
+    async function fetchLeaveDays(employeeId) {
+        const apiUrl = `http://localhost:8080/api/leaves/${employeeId}`;
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error("Failed to fetch leave data");
+            }
+            leaveDays = await response.json(); // Assuming the API returns an array of leave dates
+            console.log("Fetched leave days:", leaveDays);
+        } catch (error) {
+            console.error("Error fetching leave data:", error);
+            alert("Failed to fetch leave data. Please try again.");
+        }
+    }
+
+    // Generate the task table
+    function generateTaskTable(timesheet, weekStartDate) {
+        const tasks = timesheet.tasks;
+        const table = document.querySelector("#tasksTableBody");
+        table.innerHTML = "";
+
+        const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+        const weekStart = new Date(weekStartDate);
+
+        // Map week days to their actual dates
+        const weekDates = daysOfWeek.map((_, index) => {
+            const date = new Date(weekStart);
+            date.setDate(weekStart.getDate() + index);
+            return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+        });
+
+        // Identify leave days within the selected week and their statuses
+        const leaveDaysInWeek = {};
+        leaveDays.forEach(leave => {
+            const leaveStart = new Date(leave.startDate);
+            const leaveEnd = new Date(leave.endDate);
+
+            weekDates.forEach(date => {
+                const currentDate = new Date(date);
+                if (currentDate >= leaveStart && currentDate <= leaveEnd) {
+                    leaveDaysInWeek[date] = leave.status;
+                }
+            });
+        });
+
+        tasks.forEach(task => {
+            const row = document.createElement("tr");
+
+            let taskRow = `<td class="px-4 py-2 text-center border-b">${task.taskDescription || "N/A"}</td>`;
+
+            const hoursPerDay = {
+                monday: "",
+                tuesday: "",
+                wednesday: "",
+                thursday: "",
+                friday: "",
+                saturday: "",
+                sunday: ""
+            };
+
+            if (task.dateHoursMap) {
+                Object.keys(task.dateHoursMap).forEach(date => {
+                    const dateObj = new Date(date);
+                    const dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" }).toLowerCase();
+                    if (hoursPerDay[dayOfWeek] !== undefined) {
+                        hoursPerDay[dayOfWeek] = task.dateHoursMap[date] || "0";
+                    }
+                });
+            }
+
+            // Add non-editable cells for each day
+            daysOfWeek.forEach((day, index) => {
+                const date = weekDates[index];
+                const leaveStatus = leaveDaysInWeek[date];
+                let dayStyle = "";
+
+                if (leaveStatus === "Pending") {
+                    dayStyle = 'bg-red-500 text-white';
+                } else if (leaveStatus === "Approved") {
+                    dayStyle = 'bg-black text-white';
+                }
+
+                taskRow += `<td class="px-4 py-2 text-center border-b ${dayStyle}"><span>${hoursPerDay[day] || "0"}</span></td>`;
+            });
+
+            row.innerHTML = taskRow;
+            table.appendChild(row);
+        });
+    }
+
+    // Fetch timesheet data based on employeeId and weekStartDate
+    async function fetchTimesheetData(employeeId, weekStartDate) {
+        const apiUrl = `http://localhost:8080/api/timesheets/${employeeId}/${weekStartDate}`;
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error("Failed to fetch timesheet data");
+            }
+
+            const timesheet = await response.json();
+            console.log("Fetched timesheet:", timesheet); // Debugging
+
+            // Check if tasks exist and iterate
+            if (timesheet.tasks && timesheet.tasks.length > 0) {
+                generateTaskTable(timesheet, weekStartDate);
+            } else {
+                console.error("No tasks available for the selected timesheet.");
+                alert("No tasks available for the selected week.");
+            }
+        } catch (error) {
+            console.error("Error fetching timesheet:", error);
+            alert("Failed to fetch timesheet data. Please try again.");
+        }
+    }
+
+    // Approve timesheet
+    async function approveTimesheet() {
+        const { timesheetId } = getUrlParams();
+        const apiUrl = `http://localhost:8080/api/timesheets/${timesheetId}/approval`;
+        const requestBody = new URLSearchParams({ approvalStatus: "Approved" });
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: requestBody,
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to approve timesheet");
+            }
+
+            const updatedTimesheet = await response.json();
+            console.log("Timesheet approved successfully:", updatedTimesheet);
+
+            // SweetAlert for success message
+            Swal.fire({
+                title: "Success!",
+                text: "Timesheet approved successfully!",
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+        } catch (error) {
+            console.error("Error approving timesheet:", error);
+
+            // SweetAlert for error message
+            Swal.fire({
+                title: "Error!",
+                text: "Failed to approve timesheet. Please try again.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        }
+    }
+
+    // Get employeeId and weekStartDate from URL parameters
+    const { employeeId, weekStartDate, timesheetId } = getUrlParams();
+
+    // Set Employee ID and Week Start Date in the page
+    document.getElementById("employeeId").textContent = employeeId;
+    document.getElementById("weekStartDate").textContent = weekStartDate;
+
+    // Initialize Flatpickr
+    const weekStartDatePicker = flatpickr("#weekStartDatePicker", {
+        dateFormat: "Y-m-d",
+        defaultDate: weekStartDate, // Set default date to the one from URL parameter
+        enable: [
+            function (date) {
+                // Only allow Mondays to be selected
+                return date.getDay() === 1;
+            }
+        ],
+        onChange: function (selectedDates, dateStr, instance) {
+    const selectedDate = selectedDates[0];
+
+    // Increase the selected date by 1 day
+    const nextDay = new Date(selectedDate);
+    nextDay.setDate(selectedDate.getDate() + 1);
+
+    // Format the next day as "YYYY-MM-DD"
+    const weekStartDate = nextDay.toISOString().split("T")[0];
+
+    // Update the displayed week start date
+    document.getElementById("weekStartDate").textContent = weekStartDate;
+
+    // Update URL parameters
+    const url = new URL(window.location);
+    url.searchParams.set("weekStartDate", weekStartDate);
+    window.history.pushState({}, "", url);
+
+    // Fetch timesheet data for the updated week start date
+    fetchTimesheetData(employeeId, weekStartDate);
+}
+    });
+
+    // Function to get the start date of the week (Monday) for a given date
+    function getWeekStartDate(date) {
+        const dayOfWeek = date.getDay();
+        const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Sunday
+        const weekStart = new Date(date);
+        weekStart.setDate(diff);
+        return weekStart.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+    }
+
+    // Fetch leave days and then fetch timesheet data
+    fetchLeaveDays(employeeId).then(() => {
+        // After leave days are fetched, fetch timesheet data
+        fetchTimesheetData(employeeId, weekStartDate);
+    });
+
+    // Add event listener for the approve button
+    document.getElementById("approveButton").addEventListener("click", approveTimesheet);
+</script>
+<script src="navbar.js"></script>
+</body>
+</html>

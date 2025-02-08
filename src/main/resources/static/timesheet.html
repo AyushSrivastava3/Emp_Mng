@@ -1,0 +1,1049 @@
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Timesheet Management</title>-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">-->
+
+<!--</head>-->
+<!--<body class="bg-light">-->
+
+<!--<div class="container mt-5">-->
+<!--    <h1 class="text-center mb-4">Timesheet Management</h1>-->
+
+<!--    &lt;!&ndash; Employee Info Section &ndash;&gt;-->
+<!--    <div class="card mb-4">-->
+<!--        <div class="card-body">-->
+<!--            <h5 class="card-title">Employee Details</h5>-->
+<!--            <form id="employeeDetailsForm">-->
+<!--                <div class="row">-->
+<!--                    <div class="col-md-3 mb-3">-->
+<!--                        <label for="empName" class="form-label">Employee Name</label>-->
+<!--                        <input type="text" id="empName" class="form-control" readonly>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-3 mb-3">-->
+<!--                        <label for="empId" class="form-label">Employee ID</label>-->
+<!--                        <input type="text" id="empId" class="form-control" readonly>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-3 mb-3">-->
+<!--                        <label for="client" class="form-label">Client</label>-->
+<!--                        <input type="text" id="client" class="form-control" readonly>-->
+<!--                    </div>-->
+<!--                    <div class="col-md-3 mb-3">-->
+<!--                        <label for="designation" class="form-label">Designation</label>-->
+<!--                        <input type="text" id="designation" class="form-control" readonly>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Week Range Selection &ndash;&gt;-->
+<!--    <div class="card mb-4">-->
+<!--        <div class="card-body">-->
+<!--            <h5 class="card-title">Select Week</h5>-->
+<!--            <input id="weekStart" class="form-control w-25" placeholder="Select Week Start Date">-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Tasks Section &ndash;&gt;-->
+<!--    <div class="card mb-4">-->
+<!--        <div class="card-body">-->
+<!--            <h5 class="card-title">Tasks for the Week</h5>-->
+<!--            <table class="table table-bordered">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>Task</th>-->
+<!--                    <th>Monday</th>-->
+<!--                    <th>Tuesday</th>-->
+<!--                    <th>Wednesday</th>-->
+<!--                    <th>Thursday</th>-->
+<!--                    <th>Friday</th>-->
+<!--                    <th>Saturday</th>-->
+<!--                    <th>Sunday</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody id="tasksTableBody">-->
+<!--                &lt;!&ndash; Task Rows Will Be Generated Dynamically &ndash;&gt;-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--            <button id="addTaskBtn" class="btn btn-primary">Add New Task</button>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Submit Button &ndash;&gt;-->
+<!--    <div class="text-center">-->
+<!--        <button id="submitTimesheetBtn" class="btn btn-success">Submit Timesheet</button>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Custom scrollbar for table container */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Custom scrollbar color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+
+        /* CSS */
+.hidden-input {
+    display: none; /* Hide the input element */
+}
+
+.status-text {
+    display: block;
+    text-align: center;
+    padding: 5px;
+    font-weight: bold;
+}
+
+        html, body {
+  height: 100%; /* Ensure full height */
+  margin: 0; /* Remove default margins */
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Make the body a flex container */
+}
+
+.container {
+  flex-grow: 1; /* Allow the content to expand and fill available space */
+}
+
+footer {
+            margin-top: auto;
+        }
+         /* Stylish spinner container */
+        .spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+
+        /* Modern Stylish Spinner */
+        .stylish-spinner {
+            width: 64px;
+            height: 64px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pulsating effect */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100  leading-relaxed text-gray-800">
+<div id="navbar"></div>
+<!-- Spinner Container -->
+<div id="spinner-container" class="spinner-container">
+    <div class="stylish-spinner"></div>
+</div>
+<div class="w-full mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-2xl font-bold text-center mb-6">Timesheet Management</h1>
+
+    <!-- Employee Info Section -->
+    <div class="bg-gray-50 p-6 rounded-lg shadow mb-6">
+        <h2 class="text-lg font-semibold mb-4">Employee Details</h2>
+        <form id="employeeDetailsForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label for="empName" class="block font-medium">Employee Name</label>
+                <input type="text" id="empName" class="w-full p-2 border rounded-md bg-gray-200" readonly>
+            </div>
+            <div>
+                <label for="empId" class="block font-medium">Employee ID</label>
+                <input type="text" id="empId" class="w-full p-2 border rounded-md bg-gray-200" readonly>
+            </div>
+            <div>
+                <label for="client" class="block font-medium">Client</label>
+                <input type="text" id="client" class="w-full p-2 border rounded-md bg-gray-200" readonly>
+            </div>
+            <div>
+                <label for="designation" class="block font-medium">Designation</label>
+                <input type="text" id="designation" class="w-full p-2 border rounded-md bg-gray-200" readonly>
+            </div>
+        </form>
+    </div>
+
+    <!-- Week Range Selection -->
+    <div class="bg-gray-50 p-6 rounded-lg shadow mb-6">
+        <h2 class="text-lg font-semibold mb-4">Select Week</h2>
+        <input id="weekStart" class="w-1/4 p-2 border rounded-md" placeholder="Select Week Start Date">
+    </div>
+
+    <!-- Tasks Section -->
+    <div class="bg-gray-50 p-6 rounded-lg shadow mb-6">
+        <h2 class="text-lg font-semibold mb-4">Tasks for the Week</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Task</th>
+                    <th class="border p-2">Monday</th>
+                    <th class="border p-2">Tuesday</th>
+                    <th class="border p-2">Wednesday</th>
+                    <th class="border p-2">Thursday</th>
+                    <th class="border p-2">Friday</th>
+                    <th class="border p-2">Saturday</th>
+                    <th class="border p-2">Sunday</th>
+                </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                <!-- Task Rows Will Be Generated Dynamically -->
+                </tbody>
+            </table>
+        </div>
+        <button id="addTaskBtn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md">Add New Task</button>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+        <button id="submitTimesheetBtn" class="px-6 py-3 bg-green-500 text-white rounded-md">Submit Timesheet</button>
+    </div>
+</div>
+<footer id="footer"></footer>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Show the spinner for a few seconds while loading content
+document.addEventListener("DOMContentLoaded", function() {
+    // Simulate content loading with a timeout
+    setTimeout(function() {
+        document.getElementById("spinner-container").style.display = "none";  // Hide spinner after loading
+    }, 1100); // Adjust the delay based on your requirements
+});
+
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+
+fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('footer').innerHTML = data;
+    });
+<!--    // Populate employee details-->
+<!--    const urlParams = new URLSearchParams(window.location.search);-->
+<!--    const employeeDetails = {-->
+<!--        id: urlParams.get('id'),-->
+<!--        name: urlParams.get('name'),-->
+<!--        designation: urlParams.get('designation'),-->
+<!--        doj: urlParams.get('doj'),-->
+<!--    };-->
+<!--    const clientsParam = urlParams.get("client");-->
+<!--    if (clientsParam) {-->
+<!--        try {-->
+<!--            const clients = JSON.parse(clientsParam);-->
+<!--            const clientNames = clients.map(client => client.clientName).join(", ");-->
+<!--            document.getElementById("client").value = clientNames;-->
+<!--        } catch (error) {-->
+<!--            console.error("Error parsing clients:", error);-->
+<!--        }-->
+<!--    }-->
+<!--    document.getElementById("empName").value = employeeDetails.name || "N/A";-->
+<!--    document.getElementById("empId").value = employeeDetails.id || "N/A";-->
+<!--    document.getElementById("designation").value = employeeDetails.designation || "N/A";-->
+
+<!--    let selectedWeekStartDate = null;-->
+<!--    const weekPicker = flatpickr("#weekStart", {-->
+<!--    dateFormat: "Y-m-d",-->
+<!--    defaultDate: new Date(),-->
+<!--    enable: [-->
+<!--        function (date) {-->
+<!--            const today = new Date();-->
+<!--            const currentMonth = today.getMonth(); // Get the current month (0-11)-->
+<!--            const currentYear = today.getFullYear(); // Get the current year-->
+
+<!--            const selectedMonth = date.getMonth(); // Get the month of the selected date-->
+<!--            const selectedYear = date.getFullYear(); // Get the year of the selected date-->
+
+<!--            // Check if the selected date is a Monday-->
+<!--            const isMonday = date.getDay() === 1;-->
+
+<!--            // Allow all previous months, current month, and next month-->
+<!--            const isInValidRange = (-->
+<!--                (selectedYear < currentYear) || // All previous years-->
+<!--                (selectedYear === currentYear && selectedMonth <= currentMonth) || // All previous months in the current year-->
+<!--                (selectedYear === currentYear && selectedMonth === currentMonth + 1) || // Next month-->
+<!--                (selectedYear === currentYear + 1 && selectedMonth === 0) // Next January (next year)-->
+<!--            );-->
+
+<!--            return isMonday && isInValidRange; // Only allow Monday and within the valid date range-->
+<!--        }-->
+<!--    ],-->
+<!--    onChange: function (selectedDates) {-->
+<!--        selectedWeekStartDate = selectedDates[0];-->
+<!--        if (selectedWeekStartDate) {-->
+<!--            const formattedDate = selectedWeekStartDate.toISOString().split("T")[0]; // Format to "YYYY-MM-DD"-->
+<!--            fetchTimesheet(formattedDate); // Fetch data and then populate the table-->
+<!--            fetchLeaveDays(formattedDate);-->
+<!--        }-->
+<!--    }-->
+<!--});-->
+
+<!--// Fetch leave days-->
+<!--async function fetchLeaveDays(weekStartDate) {-->
+<!--    const employeeId = employeeDetails.id; // Replace with the actual employee ID-->
+<!--    const apiUrl = `http://localhost:8080/api/leaves/${employeeId}`;-->
+<!--    try {-->
+<!--        const response = await fetch(apiUrl);-->
+<!--        if (!response.ok) {-->
+<!--            throw new Error("Failed to fetch leave data");-->
+<!--        }-->
+<!--        leaveDays = await response.json(); // Assuming the API returns an array of leave dates-->
+<!--        console.log("Fetched leave days:", leaveDays);-->
+<!--    } catch (error) {-->
+<!--        console.error("Error fetching leave data:", error);-->
+<!--        alert("Failed to fetch leave data. Please try again.");-->
+<!--    }-->
+<!--}-->
+
+<!--    async function fetchTimesheet(weekStartDate) {-->
+<!--    const employeeId = employeeDetails.id; // Replace with the actual employee ID-->
+<!--    console.log("EmployeeId:",employeeId)-->
+<!--    console.log("Week start date:",weekStartDate)-->
+
+<!--const nextDay = new Date(weekStartDate);-->
+<!--    nextDay.setDate(nextDay.getDate() + 1); // Add 1 day to the date-->
+
+<!--    const formattedDate = nextDay.toISOString().split("T")[0]; // Format to "YYYY-MM-DD"-->
+<!--    const apiUrl = `http://localhost:8080/api/timesheets/${employeeId}/${formattedDate}`;-->
+<!--    try {-->
+<!--        const response = await fetch(apiUrl);-->
+<!--        if (!response.ok) {-->
+<!--            throw new Error("Failed to fetch timesheet data");-->
+<!--        }-->
+
+<!--        const timesheet = await response.json();-->
+<!--        console.log("Fetched timesheet:", timesheet); // Debugging-->
+
+<!--        // Check if tasks exist and iterate-->
+<!--        if (timesheet.tasks && timesheet.tasks.length > 0) {-->
+<!--            generateTaskTable(timesheet,weekStartDate);-->
+<!--        } else {-->
+<!--            console.error("No tasks available for the selected timesheet.");-->
+<!--&lt;!&ndash;            alert("No tasks available for the selected week.");&ndash;&gt;-->
+<!--        }-->
+<!--    } catch (error) {-->
+<!--        console.error("Error fetching timesheet:", error);-->
+<!--&lt;!&ndash;        alert("Failed to fetch timesheet data. Please try again.");&ndash;&gt;-->
+<!--    }-->
+<!--}-->
+<!--    // Generate task table for the selected week-->
+<!--    const tasksTableBody = document.getElementById("tasksTableBody");-->
+
+<!--let globalWeekStartDay = null;-->
+
+<!--function generateTaskTable(timesheet, weekStartDate) {-->
+<!--    const tasks = timesheet.tasks;-->
+<!--    const table = document.querySelector("#tasksTableBody");-->
+<!--    table.innerHTML = "";-->
+
+<!--    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];-->
+<!--    const weekStart = new Date(weekStartDate);-->
+
+<!--    // Map week days to their actual dates-->
+<!--    const weekDates = daysOfWeek.map((_, index) => {-->
+<!--        const date = new Date(weekStart);-->
+<!--        date.setDate(weekStart.getDate() + index);-->
+<!--        return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"-->
+<!--    });-->
+
+<!--    // Identify leave days within the selected week and their statuses-->
+<!--    const leaveDaysInWeek = {}; // Store leave days as keys and their statuses as values-->
+<!--    leaveDays.forEach(leave => {-->
+<!--        const leaveStart = new Date(leave.startDate);-->
+<!--        const leaveEnd = new Date(leave.endDate);-->
+
+<!--        weekDates.forEach(date => {-->
+<!--            const currentDate = new Date(date);-->
+<!--            const adjustedDate = new Date(currentDate); // Adjust the date by going one day back-->
+<!--            adjustedDate.setDate(adjustedDate.getDate() + 1);-->
+
+<!--            if (adjustedDate >= leaveStart && adjustedDate <= leaveEnd) {-->
+<!--                leaveDaysInWeek[date] = leave.status; // Store the leave status for the date-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+<!--    tasks.forEach(task => {-->
+<!--        const row = document.createElement("tr");-->
+<!--        let taskRow = `<td><input type="text" class="form-control task-name text-center" value="${task.taskDescription}" placeholder="Enter Task"></td>`;-->
+
+<!--        // Create a map to store hours for each day-->
+<!--        const hoursPerDay = {-->
+<!--            monday: "",-->
+<!--            tuesday: "",-->
+<!--            wednesday: "",-->
+<!--            thursday: "",-->
+<!--            friday: "",-->
+<!--            saturday: "",-->
+<!--            sunday: ""-->
+<!--        };-->
+
+<!--        if (task.dateHoursMap) {-->
+<!--            Object.keys(task.dateHoursMap).forEach(date => {-->
+<!--                const dateObj = new Date(date);-->
+<!--                const dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" }).toLowerCase();-->
+<!--                if (hoursPerDay[dayOfWeek] !== undefined) {-->
+<!--                    hoursPerDay[dayOfWeek] = task.dateHoursMap[date];-->
+<!--                }-->
+<!--            });-->
+<!--        }-->
+
+<!--        // Add inputs for hours for each day and highlight leave days based on status-->
+<!--        daysOfWeek.forEach((day, index) => {-->
+<!--            const date = weekDates[index];-->
+<!--            const leaveStatus = leaveDaysInWeek[date]; // Get the leave status for the day-->
+<!--            let dayStyle = ""; // Default style-->
+<!--            let disabledAttr = ""; // Default input field state-->
+
+<!--            if (leaveStatus === "Pending") {-->
+<!--                dayStyle = 'style="background-color: red; color: white;"'; // Red background for pending status-->
+<!--                disabledAttr = "disabled";-->
+<!--            } else if (leaveStatus === "Approved") {-->
+<!--                dayStyle = 'style="background-color: black; color: white;"'; // Black background for approved status-->
+<!--                disabledAttr = "disabled";-->
+<!--            }-->
+
+<!--            taskRow += `<td ${dayStyle}><input type="number" class="form-control task-hours text-center" value="${hoursPerDay[day]}" placeholder="Hours" ${disabledAttr}></td>`;-->
+<!--        });-->
+
+<!--        row.innerHTML = taskRow;-->
+<!--        table.appendChild(row);-->
+<!--    });-->
+<!--}-->
+
+<!--document.getElementById("addTaskBtn").addEventListener("click", function () {-->
+<!--    // Ensure a week start date is selected in the flatpickr-->
+<!--    if (!selectedWeekStartDate) {-->
+<!--        console.error("No week start date selected!");-->
+<!--        alert("Please select a week start date first.");-->
+<!--        return; // Exit the function if no date is selected-->
+<!--    }-->
+
+<!--    // Format the selected week start date for further use-->
+<!--    const weekStartDay = selectedWeekStartDate.toISOString().split("T")[0];-->
+
+<!--    // Get the current date and determine the start of the previous month-->
+<!--    const currentDate = new Date();-->
+<!--    const previousMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); // Start of the previous month-->
+
+<!--    // Check if the selected week start date is before the start of the previous month-->
+<!--    const isBeforePreviousMonth = new Date(weekStartDay) < previousMonthDate;-->
+
+<!--    // If the selected week start date is before the previous month, disable the "Add Task" button-->
+<!--    if (isBeforePreviousMonth) {-->
+<!--        document.getElementById("addTaskBtn").disabled = true;-->
+<!--        alert("Tasks cannot be added for weeks before the previous month.");-->
+<!--        return; // Exit the function if the condition is met-->
+<!--    }-->
+
+<!--    // Map week days to their actual dates-->
+<!--    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];-->
+<!--    const weekStart = new Date(weekStartDay);-->
+
+<!--    // Map each week day to its corresponding date-->
+<!--    const weekDates = daysOfWeek.map((_, index) => {-->
+<!--        const date = new Date(weekStart);-->
+<!--        date.setDate(weekStart.getDate() + index);-->
+<!--        return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"-->
+<!--    });-->
+
+<!--    // Identify leave days within the selected week (assuming `leaveDays` is defined globally)-->
+<!--    const leaveDaysInWeek = [];-->
+<!--    leaveDays.forEach(leave => {-->
+<!--        const leaveStart = new Date(leave.startDate);-->
+<!--        const leaveEnd = new Date(leave.endDate);-->
+
+<!--        weekDates.forEach(date => {-->
+<!--            const currentDate = new Date(date);-->
+<!--            const adjustedDate = new Date(currentDate); // Adjust the date by going one day back-->
+<!--            adjustedDate.setDate(adjustedDate.getDate() + 1);-->
+
+<!--            if (adjustedDate >= leaveStart && adjustedDate <= leaveEnd) {-->
+<!--                leaveDaysInWeek.push({ date, status: leave.status }); // Add the original date and status-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+<!--    // Create a new row for the task-->
+<!--    const row = document.createElement("tr");-->
+<!--    let taskRow = `<td><input type="text" class="form-control task-name" placeholder="Enter Task"></td>`;-->
+
+<!--    // Add inputs for hours for each day and highlight leave days-->
+<!--    daysOfWeek.forEach((day, index) => {-->
+<!--        const leaveDay = leaveDaysInWeek.find(leave => leave.date === weekDates[index]); // Check if the day is a leave day-->
+<!--        let dayStyle = "";-->
+<!--        let disabledAttr = "";-->
+
+<!--        if (leaveDay) {-->
+<!--            if (leaveDay.status === "pending") {-->
+<!--                dayStyle = 'style="background-color: red; color: white;"'; // Red background with white text for pending-->
+<!--            } else if (leaveDay.status === "approved") {-->
+<!--                dayStyle = 'style="background-color: black; color: white;"'; // Black background with white text for approved-->
+<!--            }-->
+<!--            disabledAttr = 'disabled'; // Disable input field for leave days-->
+<!--        }-->
+
+<!--        taskRow += `<td ${dayStyle}><input type="number" class="form-control task-hours" placeholder="Hours" ${disabledAttr}></td>`;-->
+<!--    });-->
+
+<!--    row.innerHTML = taskRow;-->
+<!--    document.querySelector("#tasksTableBody").appendChild(row);-->
+<!--});-->
+<!--// Submit Timesheet-->
+
+<!--    document.getElementById("submitTimesheetBtn").addEventListener("click", function () {-->
+<!--    if (!selectedWeekStartDate) {-->
+<!--        alert("Please select a week start date.");-->
+<!--        return;-->
+<!--    }-->
+
+<!--    // Collect task data with task date and hours-->
+<!--    const tasks = [];-->
+<!--    const taskRows = tasksTableBody.querySelectorAll("tr");-->
+
+<!--    taskRows.forEach(row => {-->
+<!--        const taskName = row.querySelector(".task-name").value.trim();-->
+<!--        const taskHoursInputs = row.querySelectorAll(".task-hours");-->
+
+<!--        const dateHoursMap = {}; // Initialize as an empty object-->
+<!--        let taskDate = new Date(selectedWeekStartDate); // Start from the selected week start date-->
+
+<!--        taskHoursInputs.forEach(input => {-->
+<!--            const hours = input.value.trim();-->
+<!--            const formattedDate = taskDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD-->
+
+<!--            if (hours) {-->
+<!--                // Add hours to the dateHoursMap only if hours are provided-->
+<!--                dateHoursMap[formattedDate] = parseFloat(hours); // Ensure hours are a number-->
+<!--            }-->
+
+<!--            // Move to the next day-->
+<!--            taskDate.setDate(taskDate.getDate() + 1);-->
+<!--        });-->
+
+<!--        if (taskName && Object.keys(dateHoursMap).length > 0) {-->
+<!--            tasks.push({-->
+<!--                taskDescription: taskName,-->
+<!--                dateHoursMap: dateHoursMap // Always ensure this is an object-->
+<!--            });-->
+<!--        }-->
+<!--    });-->
+
+<!--    if (tasks.length === 0) {-->
+<!--        alert("Please add at least one task.");-->
+<!--        return;-->
+<!--    }-->
+
+<!--    // Prepare request payload-->
+<!--    const timesheetData = {-->
+<!--        employeeId: employeeDetails.id,-->
+<!--        weekStartDate: selectedWeekStartDate.toISOString().split("T")[0],-->
+<!--        tasks: tasks-->
+<!--    };-->
+
+<!--    console.log("Submitting Timesheet Data:", timesheetData);-->
+
+
+// Populate employee details
+const urlParams = new URLSearchParams(window.location.search);
+const employeeDetails = {
+    id: urlParams.get('id'),
+    name: urlParams.get('name'),
+    designation: urlParams.get('designation'),
+    doj: urlParams.get('doj'),
+};
+
+const clientsParam = urlParams.get("client");
+if (clientsParam) {
+    try {
+        const clients = JSON.parse(clientsParam);
+        const clientNames = clients.map(client => client.clientName).join(", ");
+        document.getElementById("client").value = clientNames;
+    } catch (error) {
+        console.error("Error parsing clients:", error);
+    }
+}
+
+document.getElementById("empName").value = employeeDetails.name || "N/A";
+document.getElementById("empId").value = employeeDetails.id || "N/A";
+document.getElementById("designation").value = employeeDetails.designation || "N/A";
+
+let selectedWeekStartDate = null;
+// Helper function to format date as YYYY-MM-DD in local timezone
+function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+const weekPicker = flatpickr("#weekStart", {
+    dateFormat: "Y-m-d",
+    defaultDate: new Date(),
+    enable: [
+        function (date) {
+            const today = new Date();
+            const currentMonth = today.getMonth(); // Get the current month (0-11)
+            const currentYear = today.getFullYear(); // Get the current year
+
+            const selectedMonth = date.getMonth(); // Get the month of the selected date
+            const selectedYear = date.getFullYear(); // Get the year of the selected date
+
+            // Check if the selected date is a Monday
+            const isMonday = date.getDay() === 1;
+
+            // Allow all previous months, current month, and next month
+            const isInValidRange = (
+                (selectedYear < currentYear) || // All previous years
+                (selectedYear === currentYear && selectedMonth <= currentMonth) || // All previous months in the current year
+                (selectedYear === currentYear && selectedMonth === currentMonth + 1) || // Next month
+                (selectedYear === currentYear + 1 && selectedMonth === 0) // Next January (next year)
+            );
+
+            return isMonday && isInValidRange; // Only allow Monday and within the valid date range
+        }
+    ],
+    onChange: function (selectedDates) {
+        selectedWeekStartDate = selectedDates[0];
+        if (selectedWeekStartDate) {
+            const formattedDate = formatLocalDate(selectedWeekStartDate); // Format to "YYYY-MM-DD" in local timezone
+            fetchTimesheet(formattedDate); // Fetch data and then populate the table
+            fetchLeaveDays(formattedDate);
+        }
+    }
+});
+
+// Fetch leave days
+let leaveDays = []; // Global variable to store leave days
+async function fetchLeaveDays(weekStartDate) {
+    const employeeId = employeeDetails.id; // Replace with the actual employee ID
+    const apiUrl = `http://localhost:8080/api/leaves/${employeeId}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error("Failed to fetch leave data");
+        }
+        leaveDays = await response.json(); // Assuming the API returns an array of leave dates
+        console.log("Fetched leave days:", leaveDays);
+    } catch (error) {
+        console.error("Error fetching leave data:", error);
+        alert("Failed to fetch leave data. Please try again.");
+    }
+}
+
+// Fetch timesheet data
+async function fetchTimesheet(weekStartDate) {
+    const employeeId = employeeDetails.id; // Replace with the actual employee ID
+    console.log("EmployeeId:", employeeId);
+    console.log("Week start date:", weekStartDate);
+
+    const apiUrl = `http://localhost:8080/api/timesheets/${employeeId}/${weekStartDate}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error("Failed to fetch timesheet data");
+        }
+
+        const timesheet = await response.json();
+        console.log("Fetched timesheet:", timesheet); // Debugging
+
+        // Check if tasks exist and iterate
+        if (timesheet.tasks && timesheet.tasks.length > 0) {
+            generateTaskTable(timesheet, weekStartDate);
+        } else {
+            console.error("No tasks available for the selected timesheet.");
+        }
+    } catch (error) {
+        console.error("Error fetching timesheet:", error);
+    }
+}
+
+// Generate task table for the selected week
+const tasksTableBody = document.getElementById("tasksTableBody");
+
+function generateTaskTable(timesheet, weekStartDate) {
+    const tasks = timesheet.tasks;
+    const table = document.querySelector("#tasksTableBody");
+    table.innerHTML = "";
+
+    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const weekStart = new Date(weekStartDate);
+
+    // Map week days to their actual dates
+    const weekDates = daysOfWeek.map((_, index) => {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + index);
+        return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+    });
+
+    // Identify leave days within the selected week and their statuses
+    const leaveDaysInWeek = {}; // Store leave days as keys and their statuses as values
+    leaveDays.forEach(leave => {
+        const leaveStart = new Date(leave.startDate);
+        const leaveEnd = new Date(leave.endDate);
+
+        weekDates.forEach(date => {
+            const currentDate = new Date(date);
+            if (currentDate >= leaveStart && currentDate <= leaveEnd) {
+                leaveDaysInWeek[date] = leave.status; // Store the leave status for the date
+            }
+        });
+    });
+
+    tasks.forEach(task => {
+        const row = document.createElement("tr");
+        let taskRow = `<td><input type="text" class="form-control task-name text-center" value="${task.taskDescription}" placeholder="Enter Task"></td>`;
+
+        // Create a map to store hours for each day
+        const hoursPerDay = {
+            monday: "",
+            tuesday: "",
+            wednesday: "",
+            thursday: "",
+            friday: "",
+            saturday: "",
+            sunday: ""
+        };
+
+        if (task.dateHoursMap) {
+            Object.keys(task.dateHoursMap).forEach(date => {
+                const dateObj = new Date(date);
+                const dayOfWeek = dateObj.toLocaleString("en-US", { weekday: "long" }).toLowerCase();
+                if (hoursPerDay[dayOfWeek] !== undefined) {
+                    hoursPerDay[dayOfWeek] = task.dateHoursMap[date];
+                }
+            });
+        }
+
+        // Add inputs for hours for each day and highlight leave days based on status
+<!--        daysOfWeek.forEach((day, index) => {-->
+<!--            const date = weekDates[index];-->
+<!--            const leaveStatus = leaveDaysInWeek[date]; // Get the leave status for the day-->
+<!--            let dayStyle = ""; // Default style-->
+<!--            let disabledAttr = ""; // Default input field state-->
+
+<!--            if (leaveStatus === "Pending") {-->
+<!--                dayStyle = 'style="background-color: red; color: white;"'; // Red background for pending status-->
+<!--                disabledAttr = "disabled";-->
+<!--            } else if (leaveStatus === "Approved") {-->
+<!--                dayStyle = 'style="background-color: black; color: white;"'; // Black background for approved status-->
+<!--                disabledAttr = "disabled";-->
+<!--            }-->
+
+<!--            taskRow += `<td ${dayStyle}><input type="number" class="form-control task-hours text-center" value="${hoursPerDay[day]}" placeholder="Hours" ${disabledAttr}></td>`;-->
+<!--        });-->
+
+
+
+        daysOfWeek.forEach((day, index) => {
+    const date = weekDates[index];
+    const leaveStatus = leaveDaysInWeek[date];
+    const hours = hoursPerDay[day];
+
+    let statusText = ""; // Default status text
+    let disabledAttr = ""; // Default input field state
+    let readonlyAttr = ""; // Default read-only state
+
+    if (leaveStatus === "Pending") {
+        statusText = "Pending"; // Text for pending status
+        disabledAttr = "disabled";
+        readonlyAttr = "readonly";
+    } else if (leaveStatus === "Approved") {
+        statusText = "Approved"; // Text for approved status
+        disabledAttr = "disabled";
+        readonlyAttr = "readonly";
+    }
+
+    // Render the status text and input element
+    taskRow += `
+        <td>
+            ${statusText ? `<span class="status-text">${statusText}</span>` : ''}
+            <input type="number" class="form-control task-hours text-center ${statusText ? 'hidden-input' : ''}" value="${hours}" placeholder="Hours" ${disabledAttr} ${readonlyAttr}>
+        </td>
+    `;
+});
+
+        row.innerHTML = taskRow;
+        table.appendChild(row);
+    });
+}
+
+// Add Task Button Event Listener
+document.getElementById("addTaskBtn").addEventListener("click", function () {
+    // Ensure a week start date is selected in the flatpickr
+    if (!selectedWeekStartDate) {
+        console.error("No week start date selected!");
+        alert("Please select a week start date first.");
+        return; // Exit the function if no date is selected
+    }
+
+    // Format the selected week start date for further use
+    const weekStartDay = formatLocalDate(selectedWeekStartDate); // Use local date formatting
+
+    // Get the current date and determine the start of the previous month
+    const currentDate = new Date();
+    const previousMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1); // Start of the previous month
+
+    // Check if the selected week start date is before the start of the previous month
+    const isBeforePreviousMonth = new Date(weekStartDay) < previousMonthDate;
+
+    // If the selected week start date is before the previous month, disable the "Add Task" button
+    if (isBeforePreviousMonth) {
+        document.getElementById("addTaskBtn").disabled = true;
+        alert("Tasks cannot be added for weeks before the previous month.");
+        return; // Exit the function if the condition is met
+    }
+
+    // Map week days to their actual dates
+    const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const weekStart = new Date(weekStartDay);
+
+    // Map each week day to its corresponding date
+    const weekDates = daysOfWeek.map((_, index) => {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + index);
+        return date.toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+    });
+
+    // Identify leave days within the selected week (assuming `leaveDays` is defined globally)
+    const leaveDaysInWeek = [];
+    leaveDays.forEach(leave => {
+        const leaveStart = new Date(leave.startDate);
+        const leaveEnd = new Date(leave.endDate);
+
+        weekDates.forEach(date => {
+            const currentDate = new Date(date);
+            if (currentDate >= leaveStart && currentDate <= leaveEnd) {
+                leaveDaysInWeek.push({ date, status: leave.status }); // Add the original date and status
+            }
+        });
+    });
+
+    // Create a new row for the task
+    const row = document.createElement("tr");
+    let taskRow = `<td><input type="text" class="form-control task-name" placeholder="Enter Task"></td>`;
+
+    // Add inputs for hours for each day and highlight leave days
+<!--    daysOfWeek.forEach((day, index) => {-->
+<!--        const leaveDay = leaveDaysInWeek.find(leave => leave.date === weekDates[index]); // Check if the day is a leave day-->
+<!--        let dayStyle = "";-->
+<!--        let disabledAttr = "";-->
+
+<!--        if (leaveDay) {-->
+<!--            if (leaveDay.status === "pending") {-->
+<!--                dayStyle = 'style="background-color: red; color: white;"'; // Red background with white text for pending-->
+<!--            } else if (leaveDay.status === "approved") {-->
+<!--                dayStyle = 'style="background-color: black; color: white;"'; // Black background with white text for approved-->
+<!--            }-->
+<!--            disabledAttr = 'disabled'; // Disable input field for leave days-->
+<!--        }-->
+
+<!--        taskRow += `<td ${dayStyle}><input type="number" class="form-control task-hours" placeholder="Hours" ${disabledAttr}></td>`;-->
+<!--    });-->
+
+        daysOfWeek.forEach((day, index) => {
+    const leaveDay = leaveDaysInWeek.find(leave => leave.date === weekDates[index]); // Check if the day is a leave day
+    console.log("leaveDay",leaveDay);
+    let statusText = ""; // Default status text
+    let disabledAttr = ""; // Default input field state
+
+    if (leaveDay) {
+        if (leaveDay.status === "Pending") {
+            statusText = "Pending"; // Text for pending status
+        } else if (leaveDay.status === "Approved") {
+            statusText = "Approved"; // Text for approved status
+        }
+        disabledAttr = 'disabled'; // Disable input field for leave days
+    }
+
+    // Render the status text and input element
+    taskRow += `
+        <td>
+            ${statusText ? `<span class="status-text">${statusText}</span>` : ''}
+            <input type="number" class="form-control task-hours ${statusText ? 'hidden-input' : ''}" placeholder="Hours" ${disabledAttr}>
+        </td>
+    `;
+});
+
+    row.innerHTML = taskRow;
+    document.querySelector("#tasksTableBody").appendChild(row);
+});
+
+// Submit Timesheet
+document.getElementById("submitTimesheetBtn").addEventListener("click", function () {
+    if (!selectedWeekStartDate) {
+        alert("Please select a week start date.");
+        return;
+    }
+
+    function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+    // Collect task data with task date and hours
+    const tasks = [];
+    const taskRows = tasksTableBody.querySelectorAll("tr");
+
+    taskRows.forEach(row => {
+        const taskName = row.querySelector(".task-name").value.trim();
+        const taskHoursInputs = row.querySelectorAll(".task-hours");
+
+        const dateHoursMap = {}; // Initialize as an empty object
+        const adjusteDate = formatLocalDate(selectedWeekStartDate); // Format to "YYYY-MM-DD" in local timezone
+
+        let taskDate = new Date(adjusteDate); // Start from the selected week start date (Monday)
+
+        taskHoursInputs.forEach((input, index) => {
+            const hours = input.value.trim();
+            const formattedDate = new Date(taskDate);
+            formattedDate.setDate(taskDate.getDate() + index); // Increment date based on index
+            const formattedDateString = formattedDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+
+            if (hours) {
+                // Add hours to the dateHoursMap only if hours are provided
+                dateHoursMap[formattedDateString] = parseFloat(hours); // Ensure hours are a number
+            }
+        });
+
+        if (taskName && Object.keys(dateHoursMap).length > 0) {
+            tasks.push({
+                taskDescription: taskName,
+                dateHoursMap: dateHoursMap // Always ensure this is an object
+            });
+        }
+    });
+
+    if (tasks.length === 0) {
+        alert("Please add at least one task.");
+        return;
+    }
+
+    const formattedDate = formatLocalDate(selectedWeekStartDate); // Format to "YYYY-MM-DD" in local timezone
+
+
+    // Prepare request payload
+    const timesheetData = {
+        employeeId: employeeDetails.id,
+        weekStartDate: formattedDate,
+        tasks: tasks
+    };
+
+    console.log("Submitting Timesheet Data:", timesheetData);
+
+
+    // API call
+<!--    fetch("http://localhost:8080/api/timesheets/submit", {-->
+<!--        method: "POST",-->
+<!--        headers: {-->
+<!--            "Content-Type": "application/json"-->
+<!--        },-->
+<!--        body: JSON.stringify(timesheetData)-->
+<!--    })-->
+<!--        .then(response => {-->
+<!--            if (response.ok) {-->
+<!--                return response.text();-->
+<!--            } else {-->
+<!--                throw new Error(`Failed to submit timesheet: ${response.status}`);-->
+<!--            }-->
+<!--        })-->
+<!--        .then(message => {-->
+<!--            alert(message);-->
+<!--        })-->
+<!--        .catch(error => {-->
+<!--            console.error("Error submitting timesheet:", error);-->
+<!--            alert("Failed to submit timesheet. Please try again.");-->
+<!--        });-->
+<!--});-->
+
+    fetch("http://localhost:8080/api/timesheets/submit", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(timesheetData)
+})
+    .then(response => {
+        if (response.ok) {
+            return response.text();
+        } else {
+            throw new Error(`Failed to submit timesheet: ${response.status}`);
+        }
+    })
+    .then(message => {
+        Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: message,
+            confirmButtonColor: "#3085d6"
+        });
+    })
+    .catch(error => {
+        console.error("Error submitting timesheet:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to submit timesheet. Please try again.",
+            confirmButtonColor: "#d33"
+        });
+    });
+})
+</script>
+<script src="navbar.js"></script>
+</body>
+</html>
+

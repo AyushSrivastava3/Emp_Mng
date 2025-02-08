@@ -99,6 +99,14 @@ footer {
             <h1 class="text-4xl font-extrabold text-indigo-600 text-center absolute left-1/2 transform -translate-x-1/2">
                 Employee Directory
             </h1>
+            <div class="w-full md:w-auto lg:w-auto px-2">
+                <label for="month-select" class="block text-gray-700 font-medium mb-2">Select Month</label>
+                <input
+                        type="month"
+                        id="month-select"
+                        class="border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200"
+                />
+            </div>
             <!-- Button aligned to the right -->
             <div class="ml-auto">
                 <a href="add_employee.html" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
@@ -118,12 +126,13 @@ footer {
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"></th> <!-- Empty column for avatar -->
 
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">First Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Last Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Employee Name</th>
+<!--                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Last Name</th>-->
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Employee ID</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Job Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Department</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Client Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Apply Leave/Holidays</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Timesheet</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -163,7 +172,7 @@ fetch('navbar.html')
         // Function to fetch and display the employees
         async function fetchEmployees() {
             try {
-                const response = await fetch('http://3.6.108.76:8080/employees');
+                const response = await fetch('http://localhost:8080/employees');
                 const employees = await response.json();
 
                 const tableBody = document.getElementById('employeeTableBody');
@@ -174,6 +183,9 @@ fetch('navbar.html')
                     const row = document.createElement('tr');
                     row.classList.add('hover:bg-gray-100', 'transition', 'ease-in-out', 'duration-150');
                     console.log("employee :",employee);
+                    const clientLinks = (employee.assignedToClients || []).map(client => {
+                        return `<a href="client_view.html?id=${client.clientId}" class="text-indigo-600 hover:text-indigo-900">${client.clientName}</a>`;
+                    }).join(', ');
                     // First letter of first name for avatar
                     const avatarLetter = employee.firstName ? employee.firstName.charAt(0).toUpperCase() : '';
                     console.log("id :",employee.id);
@@ -186,15 +198,17 @@ fetch('navbar.html')
 
                     <!-- First Name Column -->
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${employee.firstName}
+                        <a href="employee-details.html?id=${employee.id}" class="text-indigo-600 hover:text-indigo-900">${employee.firstName+" "+employee.lastName}</a>
                     </td>
-
-
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${employee.lastName}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${employee.id}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${employee.personalEmail || employee.professionalEmail}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${employee.jobTitle}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${employee.department}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${clientLinks || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <a href="apply-leave.html?id=${employee.id}" class="text-indigo-600 hover:text-indigo-900">Apply Leave</a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <a href="timesheet.html?id=${employee.id}" class="text-indigo-600 hover:text-indigo-900">View Timesheet</a>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap flex items-center gap-2">
             <a href="employee-details.html?id=${employee.id}" class="text-indigo-600 hover:text-indigo-900 text-sm font-semibold">View</a>
             <button class="text-red-500 hover:text-red-700 focus:outline-none" onclick="deleteEmployee(${employee.id}, this)">
@@ -212,6 +226,37 @@ fetch('navbar.html')
             }
         }
 
+        document.getElementById("month-select").addEventListener("change", function () {
+    const selectedDate = this.value; // Format: YYYY-MM
+    const [year, month] = selectedDate.split("-");
+
+    // Fetch employees for the selected month and year
+    fetchEmployeesByMonthYear(month, year);
+});
+
+async function fetchEmployeesByMonthYear(month, year) {
+    try {
+        const response = await fetch(`http://localhost:8080/employees/employees/active?month=${month}&year=${year}`);
+        const employees = await response.json();
+
+        const tableBody = document.getElementById("employeeTableBody");
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        employees.forEach(employee => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${employee.firstName} ${employee.lastName}</td>
+                <td>${employee.id}</td>
+                <td>${employee.personalEmail || employee.professionalEmail}</td>
+                <td>${employee.assignedToClients?.map(client => client.clientName).join(", ") || "N/A"}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching employees:", error);
+    }
+}
+
         async function deleteEmployee(id, buttonElement) {
     try {
         const confirmation = await Swal.fire({
@@ -225,7 +270,7 @@ fetch('navbar.html')
         });
 
         if (confirmation.isConfirmed) {
-            const response = await fetch(`http://3.6.108.76:8080/employees/${id}`, {
+            const response = await fetch(`http://localhost:8080/employees/${id}`, {
                 method: 'DELETE'
             });
 

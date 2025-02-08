@@ -1,0 +1,290 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Pending Timesheets</title>-->
+<!--    <script src="https://cdn.tailwindcss.com"></script>-->
+<!--</head>-->
+<!--<body class="bg-gray-100 min-h-screen flex flex-col">-->
+<!--<header class="bg-blue-600 text-white py-4 shadow-md">-->
+<!--    <div class="container mx-auto px-4">-->
+<!--        <h1 class="text-2xl font-semibold">Pending Timesheets</h1>-->
+<!--    </div>-->
+<!--</header>-->
+
+<!--<main class="container mx-auto px-4 py-6 flex-grow">-->
+<!--    <div class="bg-white shadow-md rounded-lg overflow-hidden">-->
+<!--        <table class="min-w-full table-auto">-->
+<!--            <thead class="bg-blue-600 text-white">-->
+<!--            <tr>-->
+<!--                <th class="px-4 py-2 text-left">ID</th>-->
+<!--                <th class="px-4 py-2 text-left">Employee ID</th>-->
+<!--                <th class="px-4 py-2 text-left">Week Start Date</th>-->
+<!--                <th class="px-4 py-2 text-left">Submitted</th>-->
+<!--                <th class="px-4 py-2 text-left">Approval Status</th>-->
+<!--                <th class="px-4 py-2 text-left">Actions</th>-->
+<!--            </tr>-->
+<!--            </thead>-->
+<!--            <tbody id="timesheet-table" class="divide-y divide-gray-200">-->
+<!--            &lt;!&ndash; Dynamic content will be injected here &ndash;&gt;-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--    </div>-->
+<!--</main>-->
+
+<!--<footer class="bg-gray-800 text-white py-4 text-center">-->
+<!--    <p>&copy; 2025 Timesheet Management</p>-->
+<!--</footer>-->
+
+<!--<script>-->
+<!--    async function fetchPendingTimesheets() {-->
+<!--        try {-->
+<!--            const response = await fetch('http://localhost:8080/api/timesheets/pending');-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error('Failed to fetch pending timesheets');-->
+<!--            }-->
+
+<!--            const timesheets = await response.json();-->
+<!--            const tableBody = document.getElementById('timesheet-table');-->
+<!--            tableBody.innerHTML = '';-->
+
+<!--            if (timesheets.length === 0) {-->
+<!--                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">No pending timesheets found</td></tr>';-->
+<!--                return;-->
+<!--            }-->
+
+<!--            timesheets.forEach(timesheet => {-->
+<!--                const row = document.createElement('tr');-->
+<!--                row.classList.add('hover:bg-gray-100');-->
+
+<!--                row.innerHTML = `-->
+<!--                    <td class="px-4 py-2">${timesheet.id}</td>-->
+<!--                    <td class="px-4 py-2">${timesheet.employeeId}</td>-->
+<!--                    <td class="px-4 py-2">${timesheet.weekStartDate}</td>-->
+<!--                    <td class="px-4 py-2">${timesheet.submitted ? 'Yes' : 'No'}</td>-->
+<!--                    <td class="px-4 py-2">${timesheet.approvalStatus}</td>-->
+<!--                    <td class="px-4 py-2">-->
+
+<!--                        <button-->
+<!--                            onclick="redirectToApprove(${timesheet.employeeId}, '${timesheet.weekStartDate}',${timesheet.id})"-->
+<!--                            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded ml-2">-->
+<!--                            Verify & Approve-->
+<!--                        </button>-->
+
+<!--                    </td>-->
+<!--                `;-->
+
+<!--                tableBody.appendChild(row);-->
+<!--            });-->
+<!--        } catch (error) {-->
+<!--            console.error('Error:', error);-->
+<!--            const tableBody = document.getElementById('timesheet-table');-->
+<!--            tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Failed to load data</td></tr>';-->
+<!--        }-->
+<!--    }-->
+
+
+
+<!--    function redirectToApprove(employeeId, weekStartDate, timesheetId) {-->
+<!--    // Redirect to the approve page with the employeeId and weekStartDate as query parameters-->
+<!--    window.location.href = `timesheetApproval.html?employeeId=${employeeId}&weekStartDate=${weekStartDate}&timesheetId=${timesheetId}`;-->
+<!--}-->
+
+
+<!--    // Fetch data when the page loads-->
+<!--    window.onload = fetchPendingTimesheets;-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Timesheets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for table container */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Custom scrollbar color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+
+        html, body {
+  height: 100%; /* Ensure full height */
+  margin: 0; /* Remove default margins */
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Make the body a flex container */
+}
+
+.container {
+  flex-grow: 1; /* Allow the content to expand and fill available space */
+}
+
+footer {
+            margin-top: auto;
+        }
+         /* Stylish spinner container */
+        .spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+
+        /* Modern Stylish Spinner */
+        .stylish-spinner {
+            width: 64px;
+            height: 64px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pulsating effect */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-white leading-relaxed text-gray-800">
+<!-- Main Content -->
+<div id="navbar"></div>
+<!-- Spinner Container -->
+<div id="spinner-container" class="spinner-container">
+    <div class="stylish-spinner"></div>
+</div>
+<main class="w-full mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full table-auto border-collapse border border-gray-200">
+            <thead class="bg-gradient-to-r from-purple-700 to-indigo-600">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Employee ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Week Start Date</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Submitted</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Approval Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+            </tr>
+            </thead>
+            <tbody id="timesheet-table" class="divide-y divide-gray-200 bg-white">
+            <!-- Dynamic content will be injected here -->
+            </tbody>
+        </table>
+    </div>
+</main>
+<!-- Include Footer -->
+<footer id="footer"></footer>
+<!-- JavaScript -->
+<script>
+    // Show the spinner for a few seconds while loading content
+document.addEventListener("DOMContentLoaded", function() {
+    // Simulate content loading with a timeout
+    setTimeout(function() {
+        document.getElementById("spinner-container").style.display = "none";  // Hide spinner after loading
+    }, 1100); // Adjust the delay based on your requirements
+});
+
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+    });
+
+fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('footer').innerHTML = data;
+    });
+    async function fetchPendingTimesheets() {
+        try {
+            const response = await fetch('http://localhost:8080/api/timesheets/pending');
+            if (!response.ok) {
+                throw new Error('Failed to fetch pending timesheets');
+            }
+
+            const timesheets = await response.json();
+            const tableBody = document.getElementById('timesheet-table');
+            tableBody.innerHTML = '';
+
+            if (timesheets.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No pending timesheets found</td></tr>';
+                return;
+            }
+
+            timesheets.forEach(timesheet => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-100');
+
+                row.innerHTML = `
+                    <td class="px-6 py-3 text-sm text-gray-700">${timesheet.id}</td>
+                    <td class="px-6 py-3 text-sm text-gray-700">${timesheet.employeeId}</td>
+                    <td class="px-6 py-3 text-sm text-gray-700">${timesheet.weekStartDate}</td>
+                    <td class="px-6 py-3 text-sm text-gray-700">${timesheet.submitted ? 'Yes' : 'No'}</td>
+                    <td class="px-6 py-3 text-sm text-gray-700">${timesheet.approvalStatus}</td>
+                    <td class="px-6 py-3 flex space-x-2">
+                        <button
+                            onclick="redirectToApprove(${timesheet.employeeId}, '${timesheet.weekStartDate}', ${timesheet.id})"
+                            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded">
+                            Verify & Approve
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            const tableBody = document.getElementById('timesheet-table');
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Failed to load data</td></tr>';
+        }
+    }
+
+    function redirectToApprove(employeeId, weekStartDate, timesheetId) {
+        window.location.href = `timesheetApproval.html?employeeId=${employeeId}&weekStartDate=${weekStartDate}&timesheetId=${timesheetId}`;
+    }
+
+    // Fetch data when the page loads
+    window.onload = fetchPendingTimesheets;
+</script>
+<script src="navbar.js"></script>
+
+</body>
+</html>

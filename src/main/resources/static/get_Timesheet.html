@@ -1,0 +1,595 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Timesheet Template</title>-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container mt-5">-->
+<!--    <h2>Timesheet Template</h2>-->
+
+<!--    &lt;!&ndash; Form to Fetch Timesheet &ndash;&gt;-->
+<!--    <form id="fetchTimesheetForm" class="mb-4">-->
+<!--        <div class="row">-->
+<!--            <div class="col-md-4">-->
+<!--                <label for="employeeId" class="form-label">Employee ID:</label>-->
+<!--                <input type="number" id="employeeId" class="form-control" required>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <label for="weekStartDate" class="form-label">Week Start Date:</label>-->
+<!--                <input type="date" id="weekStartDate" class="form-control" required>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <button type="submit" class="btn btn-primary mt-4">Fetch Timesheet</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </form>-->
+
+<!--    &lt;!&ndash; Timesheet Table &ndash;&gt;-->
+<!--    <div id="timesheetContainer" style="display: none;">-->
+<!--        <h3>Timesheet</h3>-->
+<!--        <table class="table table-bordered">-->
+<!--            <thead>-->
+<!--            <tr>-->
+<!--                <th>Task Description</th>-->
+<!--                <th>Mon</th>-->
+<!--                <th>Tue</th>-->
+<!--                <th>Wed</th>-->
+<!--                <th>Thu</th>-->
+<!--                <th>Fri</th>-->
+<!--                <th>Sat</th>-->
+<!--                <th>Sun</th>-->
+<!--            </tr>-->
+<!--            </thead>-->
+<!--            <tbody id="timesheetTableBody">-->
+<!--            &lt;!&ndash; Rows will be dynamically populated &ndash;&gt;-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--        <button id="editTimesheetBtn" class="btn btn-success">Save Changes</button>-->
+<!--    </div>-->
+<!--</div>-->
+<!--<script>-->
+<!--    // Form submission to fetch timesheet-->
+<!--    document.getElementById("fetchTimesheetForm").addEventListener("submit", function (event) {-->
+<!--        event.preventDefault();-->
+
+<!--        const employeeId = document.getElementById("employeeId").value;-->
+<!--        const weekStartDate = document.getElementById("weekStartDate").value;-->
+
+<!--        if (!employeeId || !weekStartDate) {-->
+<!--            alert("Please enter all fields.");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        fetchTimesheet(employeeId, weekStartDate);-->
+<!--    });-->
+
+<!--    // Function to fetch timesheet-->
+<!--    function fetchTimesheet(employeeId, weekStartDate) {-->
+<!--        fetch(`http://localhost:8080/api/timesheets/${employeeId}/${weekStartDate}`)-->
+<!--            .then(response => {-->
+<!--                if (response.ok) {-->
+<!--                    return response.json();-->
+<!--                } else {-->
+<!--                    throw new Error(`Failed to fetch timesheet: ${response.status}`);-->
+<!--                }-->
+<!--            })-->
+<!--            .then(timesheet => {-->
+<!--                populateTimesheetTable(timesheet);-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error("Error fetching timesheet:", error);-->
+<!--                alert("Failed to fetch timesheet. Please try again.");-->
+<!--            });-->
+<!--    }-->
+
+<!--    // Function to populate timesheet table-->
+<!--    function populateTimesheetTable(timesheet) {-->
+<!--        const timesheetTableBody = document.getElementById("timesheetTableBody");-->
+<!--        timesheetTableBody.innerHTML = ""; // Clear any existing rows-->
+
+<!--        timesheet.tasks.forEach(task => {-->
+<!--            const row = document.createElement("tr");-->
+
+<!--            const dateHoursInputs = Object.entries(task.dateHoursMap)-->
+<!--                .map(([date, hours]) => `<td><input type="number" class="form-control task-hours" value="${hours}" data-date="${date}"></td>`)-->
+<!--                .join("");-->
+
+<!--            row.innerHTML = `-->
+<!--                <td>-->
+<!--                    <input type="text" class="form-control task-name" value="${task.taskDescription}" data-task-id="${task.id || ''}">-->
+<!--                </td>-->
+<!--                ${dateHoursInputs}-->
+<!--            `;-->
+<!--            timesheetTableBody.appendChild(row);-->
+<!--        });-->
+
+<!--        document.getElementById("timesheetContainer").style.display = "block";-->
+<!--    }-->
+
+<!--    // Function to save changes to the timesheet-->
+<!--    document.getElementById("editTimesheetBtn").addEventListener("click", function () {-->
+<!--        const tasks = [];-->
+<!--        const taskRows = document.querySelectorAll("#timesheetTableBody tr");-->
+
+<!--        taskRows.forEach(row => {-->
+<!--            const taskName = row.querySelector(".task-name").value;-->
+<!--            const taskId = row.querySelector(".task-name").dataset.taskId; // Capture the task ID-->
+<!--            const taskHoursInputs = row.querySelectorAll(".task-hours");-->
+
+<!--            const dateHoursMap = {};-->
+<!--            taskHoursInputs.forEach(input => {-->
+<!--                const hours = input.value;-->
+<!--                const date = input.dataset.date;-->
+<!--                if (hours) {-->
+<!--                    dateHoursMap[date] = hours;-->
+<!--                }-->
+<!--            });-->
+
+<!--            if (taskName && Object.keys(dateHoursMap).length > 0) {-->
+<!--                tasks.push({-->
+<!--                    id: taskId || null, // Include ID if available-->
+<!--                    taskDescription: taskName,-->
+<!--                    dateHoursMap: dateHoursMap-->
+<!--                });-->
+<!--            }-->
+<!--        });-->
+
+<!--        if (tasks.length === 0) {-->
+<!--            alert("Please add at least one task.");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        const employeeId = document.getElementById("employeeId").value;-->
+<!--        const weekStartDate = document.getElementById("weekStartDate").value;-->
+
+<!--        const updatedTimesheet = {-->
+<!--            employeeId: employeeId,-->
+<!--            weekStartDate: weekStartDate,-->
+<!--            tasks: tasks-->
+<!--        };-->
+
+<!--        fetch("http://localhost:8080/api/timesheets/update", {-->
+<!--            method: "PUT",-->
+<!--            headers: {-->
+<!--                "Content-Type": "application/json"-->
+<!--            },-->
+<!--            body: JSON.stringify(updatedTimesheet)-->
+<!--        })-->
+<!--            .then(response => {-->
+<!--                if (response.ok) {-->
+<!--                    return response.text();-->
+<!--                } else {-->
+<!--                    throw new Error(`Failed to update timesheet: ${response.status}`);-->
+<!--                }-->
+<!--            })-->
+<!--            .then(message => {-->
+<!--                alert(message);-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error("Error updating timesheet:", error);-->
+<!--                alert("Failed to update timesheet. Please try again.");-->
+<!--            });-->
+<!--    });-->
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet Template</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Timesheet Template</h2>
+
+    <!-- Form to Fetch Timesheet -->
+    <form id="fetchTimesheetForm" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="employeeId" class="form-label">Employee ID:</label>
+                <input type="number" id="employeeId" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label for="weekStartDate" class="form-label">Week Start Date:</label>
+                <input type="date" id="weekStartDate" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary mt-4">Fetch Timesheet</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Timesheet Table -->
+    <div id="timesheetContainer" style="display: none;">
+        <h3>Timesheet</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Task Description</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+            </tr>
+            </thead>
+            <tbody id="timesheetTableBody">
+            <!-- Rows will be dynamically populated -->
+            </tbody>
+        </table>
+        <button id="addNewTaskBtn" class="btn btn-secondary mb-3">Add New Task</button>
+        <button id="editTimesheetBtn" class="btn btn-success">Save Changes</button>
+    </div>
+</div>
+<script>
+    // Form submission to fetch timesheet
+    document.getElementById("fetchTimesheetForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const employeeId = document.getElementById("employeeId").value;
+        const weekStartDate = document.getElementById("weekStartDate").value;
+
+        if (!employeeId || !weekStartDate) {
+            alert("Please enter all fields.");
+            return;
+        }
+
+        fetchTimesheet(employeeId, weekStartDate);
+    });
+
+    // Function to fetch timesheet
+    function fetchTimesheet(employeeId, weekStartDate) {
+        fetch(`http://localhost:8080/api/timesheets/${employeeId}/${weekStartDate}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error(`Failed to fetch timesheet: ${response.status}`);
+                }
+            })
+            .then(timesheet => {
+                populateTimesheetTable(timesheet);
+            })
+            .catch(error => {
+                console.error("Error fetching timesheet:", error);
+                alert("Failed to fetch timesheet. Please try again.");
+            });
+    }
+
+    // Function to populate timesheet table
+    function populateTimesheetTable(timesheet) {
+        const timesheetTableBody = document.getElementById("timesheetTableBody");
+        timesheetTableBody.innerHTML = ""; // Clear any existing rows
+
+        timesheet.tasks.forEach(task => {
+            const row = document.createElement("tr");
+
+            const dateHoursInputs = Object.entries(task.dateHoursMap)
+                .map(([date, hours]) =>
+                    `<td><input type="number" class="form-control task-hours" value="${hours || ''}" data-date="${date}"></td>`
+                )
+                .join("");
+
+            row.innerHTML =
+                `<td>
+                    <input type="text" class="form-control task-name" value="${task.taskDescription}" data-task-id="${task.id || ''}">
+                </td>` + dateHoursInputs;
+
+            timesheetTableBody.appendChild(row);
+        });
+
+        document.getElementById("timesheetContainer").style.display = "block";
+    }
+
+    // Function to add a new task to the table
+    document.getElementById("addNewTaskBtn").addEventListener("click", function () {
+        const timesheetTableBody = document.getElementById("timesheetTableBody");
+        const newRow = document.createElement("tr");
+
+        const dateHoursInputs = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            .map(day =>
+                `<td><input type="number" class="form-control task-hours" value="" data-date="${day.toLowerCase()}"></td>`
+            )
+            .join("");
+
+        newRow.innerHTML =
+            `<td>
+                <input type="text" class="form-control task-name" placeholder="Enter task description" data-task-id="">
+            </td>` + dateHoursInputs;
+
+        timesheetTableBody.appendChild(newRow);
+    });
+
+    // Function to save changes to the timesheet
+    document.getElementById("editTimesheetBtn").addEventListener("click", function () {
+        const tasks = [];
+        const taskRows = document.querySelectorAll("#timesheetTableBody tr");
+
+        taskRows.forEach(row => {
+            const taskName = row.querySelector(".task-name").value;
+            const taskId = row.querySelector(".task-name").dataset.taskId; // Capture the task ID
+            const taskHoursInputs = row.querySelectorAll(".task-hours");
+
+            const dateHoursMap = {};
+            taskHoursInputs.forEach(input => {
+                const hours = input.value;
+                const date = input.dataset.date;
+                if (hours) {
+                    dateHoursMap[date] = hours;
+                }
+            });
+
+            if (taskName && Object.keys(dateHoursMap).length > 0) {
+                tasks.push({
+                    id: taskId || null, // Include ID if available
+                    taskDescription: taskName,
+                    dateHoursMap: dateHoursMap
+                });
+            }
+        });
+
+        if (tasks.length === 0) {
+            alert("Please add at least one task.");
+            return;
+        }
+
+        const employeeId = document.getElementById("employeeId").value;
+        const weekStartDate = document.getElementById("weekStartDate").value;
+
+        const updatedTimesheet = {
+            employeeId: employeeId,
+            weekStartDate: weekStartDate,
+            tasks: tasks
+        };
+
+        fetch("http://localhost:8080/api/timesheets/update", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedTimesheet)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error(`Failed to update timesheet: ${response.status}`);
+                }
+            })
+            .then(message => {
+                alert(message);
+            })
+            .catch(error => {
+                console.error("Error updating timesheet:", error);
+                alert("Failed to update timesheet. Please try again.");
+            });
+    });
+</script>
+
+</body>
+</html>
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Timesheet Template</title>-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container mt-5">-->
+<!--    <h2>Timesheet Template</h2>-->
+
+<!--    &lt;!&ndash; Form to Fetch Timesheet &ndash;&gt;-->
+<!--    <form id="fetchTimesheetForm" class="mb-4">-->
+<!--        <div class="row">-->
+<!--            <div class="col-md-4">-->
+<!--                <label for="employeeId" class="form-label">Employee ID:</label>-->
+<!--                <input type="number" id="employeeId" class="form-control" required>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <label for="weekStartDate" class="form-label">Week Start Date:</label>-->
+<!--                <input type="date" id="weekStartDate" class="form-control" required>-->
+<!--            </div>-->
+<!--            <div class="col-md-4">-->
+<!--                <button type="submit" class="btn btn-primary mt-4">Fetch Timesheet</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </form>-->
+
+<!--    &lt;!&ndash; Timesheet Table &ndash;&gt;-->
+<!--    <div id="timesheetContainer" style="display: none;">-->
+<!--        <h3>Timesheet</h3>-->
+<!--        <table class="table table-bordered">-->
+<!--            <thead>-->
+<!--            <tr>-->
+<!--                <th>Task Description</th>-->
+<!--                <th>Mon</th>-->
+<!--                <th>Tue</th>-->
+<!--                <th>Wed</th>-->
+<!--                <th>Thu</th>-->
+<!--                <th>Fri</th>-->
+<!--                <th>Sat</th>-->
+<!--                <th>Sun</th>-->
+<!--            </tr>-->
+<!--            </thead>-->
+<!--            <tbody id="timesheetTableBody">-->
+<!--            &lt;!&ndash; Rows will be dynamically populated &ndash;&gt;-->
+<!--            </tbody>-->
+<!--        </table>-->
+<!--        <button id="addNewTaskBtn" class="btn btn-secondary mb-3">Add New Task</button>-->
+<!--        <button id="editTimesheetBtn" class="btn btn-success">Save Changes</button>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    // Form submission to fetch timesheet-->
+<!--    document.getElementById("fetchTimesheetForm").addEventListener("submit", function (event) {-->
+<!--        event.preventDefault();-->
+
+<!--        const employeeId = document.getElementById("employeeId").value;-->
+<!--        const weekStartDate = document.getElementById("weekStartDate").value;-->
+
+<!--        if (!employeeId || !weekStartDate) {-->
+<!--            alert("Please enter all fields.");-->
+<!--            return;-->
+<!--        }-->
+
+<!--        fetchTimesheet(employeeId, weekStartDate);-->
+<!--    });-->
+
+<!--    // Function to fetch timesheet-->
+<!--    function fetchTimesheet(employeeId, weekStartDate) {-->
+<!--        fetch(`http://localhost:8080/api/timesheets/${employeeId}/${weekStartDate}`)-->
+<!--            .then(response => {-->
+<!--                if (response.ok) {-->
+<!--                    return response.json();-->
+<!--                } else {-->
+<!--                    throw new Error(`Failed to fetch timesheet: ${response.status}`);-->
+<!--                }-->
+<!--            })-->
+<!--            .then(timesheet => {-->
+<!--                populateTimesheetTable(timesheet);-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error("Error fetching timesheet:", error);-->
+<!--                alert("Failed to fetch timesheet. Please try again.");-->
+<!--            });-->
+<!--    }-->
+
+<!--    // Function to populate timesheet table-->
+<!--    function populateTimesheetTable(timesheet) {-->
+<!--        const timesheetTableBody = document.getElementById("timesheetTableBody");-->
+<!--        timesheetTableBody.innerHTML = ""; // Clear any existing rows-->
+
+<!--        timesheet.tasks.forEach(task => {-->
+<!--            const row = document.createElement("tr");-->
+
+<!--            const dateHoursInputs = Object.entries(task.dateHoursMap)-->
+<!--                .map(([date, hours]) =>-->
+<!--                    `<td><input type="number" class="form-control task-hours" value="${hours || ''}" data-date="${date}"></td>`-->
+<!--                )-->
+<!--                .join("");-->
+
+<!--            row.innerHTML =-->
+<!--                `<td>-->
+<!--                    <input type="text" class="form-control task-name" value="${task.taskDescription}" data-task-id="${task.id || ''}">-->
+<!--                </td>` + dateHoursInputs;-->
+
+<!--            timesheetTableBody.appendChild(row);-->
+<!--        });-->
+
+<!--        document.getElementById("timesheetContainer").style.display = "block";-->
+<!--    }-->
+
+<!--    // Function to add a new task to the table-->
+<!--    document.getElementById("addNewTaskBtn").addEventListener("click", function () {-->
+<!--        const timesheetTableBody = document.getElementById("timesheetTableBody");-->
+<!--        const newRow = document.createElement("tr");-->
+
+<!--        const dateHoursInputs = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']-->
+<!--            .map(day =>-->
+<!--                `<td><input type="number" class="form-control task-hours" value="" data-date="${day.toLowerCase()}"></td>`-->
+<!--            )-->
+<!--            .join("");-->
+
+<!--        newRow.innerHTML =-->
+<!--            `<td>-->
+<!--                <input type="text" class="form-control task-name" placeholder="Enter task description" data-task-id="">-->
+<!--            </td>` + dateHoursInputs;-->
+
+<!--        timesheetTableBody.appendChild(newRow);-->
+<!--    });-->
+
+<!--    // Function to save changes to the timesheet-->
+<!--    // Function to save changes to the timesheet-->
+<!--document.getElementById("editTimesheetBtn").addEventListener("click", function () {-->
+<!--    const tasks = [];-->
+<!--    const taskRows = document.querySelectorAll("#timesheetTableBody tr");-->
+
+<!--    taskRows.forEach(row => {-->
+<!--        const taskName = row.querySelector(".task-name").value;-->
+<!--        const taskId = row.querySelector(".task-name").dataset.taskId; // Capture the task ID-->
+<!--        const taskHoursInputs = row.querySelectorAll(".task-hours");-->
+
+<!--        const dateHoursMap = {};-->
+<!--        taskHoursInputs.forEach(input => {-->
+<!--            const hours = input.value;-->
+<!--            const date = input.dataset.date; // Get the specific date for the day-->
+<!--            if (hours) {-->
+<!--                // Add the hours for the specific date (not just day of the week)-->
+<!--                dateHoursMap[date] = hours;-->
+<!--            }-->
+<!--        });-->
+
+<!--        if (taskName && Object.keys(dateHoursMap).length > 0) {-->
+<!--            tasks.push({-->
+<!--                id: taskId || null, // Include ID if available-->
+<!--                taskDescription: taskName,-->
+<!--                dateHoursMap: dateHoursMap-->
+<!--            });-->
+<!--        }-->
+<!--    });-->
+
+<!--    if (tasks.length === 0) {-->
+<!--        alert("Please add at least one task.");-->
+<!--        return;-->
+<!--    }-->
+
+<!--    const employeeId = document.getElementById("employeeId").value;-->
+<!--    const weekStartDate = document.getElementById("weekStartDate").value;-->
+
+<!--    const updatedTimesheet = {-->
+<!--        employeeId: employeeId,-->
+<!--        weekStartDate: weekStartDate,-->
+<!--        tasks: tasks-->
+<!--    };-->
+<!--    console.log("updatedTimesheet",updatedTimesheet);-->
+
+<!--    fetch("http://localhost:8080/api/timesheets/update", {-->
+<!--        method: "PUT",-->
+<!--        headers: {-->
+<!--            "Content-Type": "application/json"-->
+<!--        },-->
+<!--        body: JSON.stringify(updatedTimesheet)-->
+<!--    })-->
+<!--        .then(response => {-->
+<!--            if (response.ok) {-->
+<!--                return response.text();-->
+<!--            } else {-->
+<!--                throw new Error(`Failed to update timesheet: ${response.status}`);-->
+<!--            }-->
+<!--        })-->
+<!--        .then(message => {-->
+<!--            alert(message);-->
+<!--        })-->
+<!--        .catch(error => {-->
+<!--            console.error("Error updating timesheet:", error);-->
+<!--            alert("Failed to update timesheet. Please try again.");-->
+<!--        });-->
+<!--});-->
+
+<!--</script>-->
+
+<!--</body>-->
+<!--</html>-->

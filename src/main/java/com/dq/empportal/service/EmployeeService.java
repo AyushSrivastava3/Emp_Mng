@@ -67,6 +67,14 @@ public class EmployeeService {
             employee.setInsurancePlanDetails(employeeDetails.getInsurancePlanDetails());
             employee.setLeavesBalance(employeeDetails.getLeavesBalance());
             employee.setOtherBenefits(employeeDetails.getOtherBenefits());
+            employee.setWorkHours(employeeDetails.getWorkHours());
+            employee.setLeaveRequests(employeeDetails.getLeaveRequests());
+            employee.setAttendanceTracking(employeeDetails.getAttendanceTracking());
+            employee.setTimesheets(employeeDetails.getTimesheets());
+            employee.setLaptopDetails(employeeDetails.getLaptopDetails());
+            employee.setLaptopDeliveryAddress(employeeDetails.getLaptopDeliveryAddress());
+            employee.setLaptopReceivedDate(employeeDetails.getLaptopReceivedDate());
+            employee.setLaptopBills(employeeDetails.getLaptopBills());
 
             return employeeRepository.save(employee);
         }).orElseThrow(() -> new RuntimeException("Employee not found"));
@@ -77,37 +85,37 @@ public class EmployeeService {
         employeeRepository.deleteById(id);
     }
 
-    public Employee updateDays(Integer infoId, List<LocalDate> leaveDays, List<LocalDate> holidays, List<LocalDate> nonBillableDays) {
-
-        Employee info = employeeRepository.findById(infoId)
-                .orElseThrow(() -> new EntityNotFoundException("EmployeeClientInfo not found"));
-
-        // Append new leaveDays, if provided
-        if (leaveDays != null && !leaveDays.isEmpty()) {
-            List<LocalDate> existingLeaveDays = info.getLeaveDays();
-            Set<LocalDate> updatedLeaveDays = new HashSet<>(existingLeaveDays);  // Convert to Set to avoid duplicates
-            updatedLeaveDays.addAll(leaveDays);  // Add new leave days
-            info.setLeaveDays(new ArrayList<>(updatedLeaveDays));  // Convert back to List
-        }
-
-        // Append new holidays, if provided
-        if (holidays != null && !holidays.isEmpty()) {
-            List<LocalDate> existingHolidays = info.getHolidays();
-            Set<LocalDate> updatedHolidays = new HashSet<>(existingHolidays);
-            updatedHolidays.addAll(holidays);
-            info.setHolidays(new ArrayList<>(updatedHolidays));
-        }
-
-        // Append new nonBillableDays, if provided
-        if (nonBillableDays != null && !nonBillableDays.isEmpty()) {
-            List<LocalDate> existingNonBillableDays = info.getNonBillableDays();
-            Set<LocalDate> updatedNonBillableDays = new HashSet<>(existingNonBillableDays);
-            updatedNonBillableDays.addAll(nonBillableDays);
-            info.setNonBillableDays(new ArrayList<>(updatedNonBillableDays));
-        }
-
-        return employeeRepository.save(info);
-    }
+//    public Employee updateDays(Integer infoId, List<LocalDate> leaveDays, List<LocalDate> holidays, List<LocalDate> nonBillableDays) {
+//
+//        Employee info = employeeRepository.findById(infoId)
+//                .orElseThrow(() -> new EntityNotFoundException("EmployeeClientInfo not found"));
+//
+//        // Append new leaveDays, if provided
+//        if (leaveDays != null && !leaveDays.isEmpty()) {
+//            List<LocalDate> existingLeaveDays = info.getLeaveDays();
+//            Set<LocalDate> updatedLeaveDays = new HashSet<>(existingLeaveDays);  // Convert to Set to avoid duplicates
+//            updatedLeaveDays.addAll(leaveDays);  // Add new leave days
+//            info.setLeaveDays(new ArrayList<>(updatedLeaveDays));  // Convert back to List
+//        }
+//
+//        // Append new holidays, if provided
+//        if (holidays != null && !holidays.isEmpty()) {
+//            List<LocalDate> existingHolidays = info.getHolidays();
+//            Set<LocalDate> updatedHolidays = new HashSet<>(existingHolidays);
+//            updatedHolidays.addAll(holidays);
+//            info.setHolidays(new ArrayList<>(updatedHolidays));
+//        }
+//
+//        // Append new nonBillableDays, if provided
+//        if (nonBillableDays != null && !nonBillableDays.isEmpty()) {
+//            List<LocalDate> existingNonBillableDays = info.getNonBillableDays();
+//            Set<LocalDate> updatedNonBillableDays = new HashSet<>(existingNonBillableDays);
+//            updatedNonBillableDays.addAll(nonBillableDays);
+//            info.setNonBillableDays(new ArrayList<>(updatedNonBillableDays));
+//        }
+//
+//        return employeeRepository.save(info);
+//    }
 
 
     public List<Employee> getActiveEmployeesInMonth(int year, int month) {
@@ -139,5 +147,9 @@ public class EmployeeService {
         }
 
         return employeeRepository.save(info);
+    }
+
+    public Optional<Employee> getEmployeeByProfessionalemail(String email) {
+        return employeeRepository.findByProfessionalEmail(email);
     }
 }

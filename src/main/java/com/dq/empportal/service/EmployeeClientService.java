@@ -1,5 +1,6 @@
 package com.dq.empportal.service;
 
+import com.dq.empportal.dtos.ClientInfo;
 import com.dq.empportal.dtos.EmployeeClientInfoDTO;
 import com.dq.empportal.model.Client;
 import com.dq.empportal.repository.ClientRepository;
@@ -15,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,8 +58,11 @@ public class EmployeeClientService {
         // Save the employee-client assignment
         employeeClientInfoRepository.save(employeeClientInfo);
 
+        employee.getAssignedToClients().add(clientToClientInfo(client));
+
         // You might want to save the client again if you want to persist the changes to the resources list
         clientRepository.save(client);
+        employeeRepository.save(employee);
     }
 //    public EmployeeClientInfo updateDays(Integer infoId, List<LocalDate> leaveDays, List<LocalDate> holidays, List<LocalDate> nonBillableDays) {
 //        EmployeeClientInfo info = employeeClientInfoRepository.findById(infoId)
@@ -156,6 +157,10 @@ public class EmployeeClientService {
 //                        .collect(Collectors.toList())
 //        )).collect(Collectors.toList());
 //    }
+    public ClientInfo clientToClientInfo(Client client){
+        ClientInfo clientInfo=new ClientInfo(client.getId(), client.getClientName());
+        return clientInfo;
+    }
 public List<EmployeeClientInfoDTO> getEmployeesForClientInMonth(Integer clientId, String yearMonth) {
     Client client = clientRepository.findById(clientId)
             .orElseThrow(() -> new RuntimeException("Client not found"));

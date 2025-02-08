@@ -1,80 +1,361 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Submit Leave Request</title>-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">-->
+<!--</head>-->
+<!--<body class="bg-gray-100">-->
+<!--<div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">-->
+<!--    <h2 class="text-2xl font-bold mb-6">Submit Leave Request</h2>-->
+<!--    <form id="leaveForm" class="space-y-4">-->
+<!--        <div>-->
+<!--            <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>-->
+<!--            <input type="date" id="startDate" name="startDate" required-->
+<!--                   class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>-->
+<!--            <input type="date" id="endDate" name="endDate" required-->
+<!--                   class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <label for="type" class="block text-sm font-medium text-gray-700">Leave Type</label>-->
+<!--            <select id="type" name="type"-->
+<!--                    class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">-->
+<!--                <option value="Sick">Sick</option>-->
+<!--                <option value="Vacation">Vacation</option>-->
+<!--                &lt;!&ndash; Add more leave types as needed &ndash;&gt;-->
+<!--            </select>-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>-->
+<!--            <textarea id="reason" name="reason" rows="4"-->
+<!--                      class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>-->
+<!--        </div>-->
+
+<!--        <div>-->
+<!--            <button type="submit"-->
+<!--                    class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">-->
+<!--                Submit Leave Request-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </form>-->
+<!--    <div id="message" class="mt-4 text-green-600"></div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    document.getElementById('leaveForm').addEventListener('submit', function(e) {-->
+<!--        e.preventDefault();-->
+
+<!--        const leaveData = {-->
+<!--            startDate: document.getElementById('startDate').value,-->
+<!--            endDate: document.getElementById('endDate').value,-->
+<!--            type: document.getElementById('type').value,-->
+<!--            reason: document.getElementById('reason').value-->
+<!--        };-->
+
+<!--        fetch('http://localhost:8080/api/leave', {-->
+<!--            method: 'POST',-->
+<!--            headers: {-->
+<!--                'Content-Type': 'application/json'-->
+<!--            },-->
+<!--            body: JSON.stringify(leaveData)-->
+<!--        })-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            document.getElementById('message').innerText = "Leave Request Submitted Successfully!";-->
+<!--        })-->
+<!--        .catch((error) => {-->
+<!--            console.error('Error:', error);-->
+<!--            document.getElementById('message').innerText = "Failed to Submit Leave Request";-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Leave Request</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Leave Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Custom scrollbar for table container */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Custom scrollbar color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f3f4f6;
+        }
+
+        html, body {
+  height: 100%; /* Ensure full height */
+  margin: 0; /* Remove default margins */
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Make the body a flex container */
+}
+
+.container {
+  flex-grow: 1; /* Allow the content to expand and fill available space */
+}
+
+footer {
+            margin-top: auto;
+        }
+         /* Stylish spinner container */
+        .spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+
+        /* Modern Stylish Spinner */
+        .stylish-spinner {
+            width: 64px;
+            height: 64px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pulsating effect */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
-<div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-    <h2 class="text-2xl font-bold mb-6">Submit Leave Request</h2>
-    <form id="leaveForm" class="space-y-4">
-        <div>
-            <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
-            <input type="date" id="startDate" name="startDate" required
-                   class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        </div>
-
-        <div>
-            <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
-            <input type="date" id="endDate" name="endDate" required
-                   class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-        </div>
-
-        <div>
-            <label for="type" class="block text-sm font-medium text-gray-700">Leave Type</label>
-            <select id="type" name="type"
-                    class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                <option value="Sick">Sick</option>
-                <option value="Vacation">Vacation</option>
-                <!-- Add more leave types as needed -->
-            </select>
-        </div>
-
-        <div>
-            <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>
-            <textarea id="reason" name="reason" rows="4"
-                      class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
-        </div>
-
-        <div>
-            <button type="submit"
-                    class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                Submit Leave Request
-            </button>
-        </div>
-    </form>
-    <div id="message" class="mt-4 text-green-600"></div>
+<div id="navbar"></div>
+<!-- Spinner Container -->
+<div id="spinner-container" class="spinner-container">
+    <div class="stylish-spinner"></div>
 </div>
+<div class="w-full mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <h1 class="flex justify-center items-center text-2xl font-bold mb-4 text-gray-700">Leave Management</h1>
+    <table class="table-auto w-full bg-white rounded-lg shadow-lg overflow-hidden">
+        <thead>
+        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <th class="py-3 px-6 text-left">Employee Name</th>
+            <th class="py-3 px-6 text-left">Leave Type</th>
+            <th class="py-3 px-6 text-left">Start Date</th>
+            <th class="py-3 px-6 text-left">End Date</th>
+            <th class="py-3 px-6 text-left">Reason</th>
+            <th class="py-3 px-6 text-center">Status</th>
+            <th class="py-3 px-6 text-center">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="leaveTableBody" class="text-gray-600 text-sm font-light">
 
+        <!-- Leave rows will be dynamically injected here -->
+        </tbody>
+    </table>
+</div>
+<footer id="footer"></footer>
 <script>
-    document.getElementById('leaveForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const leaveData = {
-            startDate: document.getElementById('startDate').value,
-            endDate: document.getElementById('endDate').value,
-            type: document.getElementById('type').value,
-            reason: document.getElementById('reason').value
-        };
-
-        fetch('http://3.6.108.76:8080/api/leave', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(leaveData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('message').innerText = "Leave Request Submitted Successfully!";
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            document.getElementById('message').innerText = "Failed to Submit Leave Request";
-        });
+    document.addEventListener("DOMContentLoaded", function() {
+        // Simulate content loading with a timeout
+        setTimeout(function() {
+            document.getElementById("spinner-container").style.display = "none";  // Hide spinner after loading
+        }, 1100); // Adjust the delay based on your requirements
     });
+
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+
+
+
+        const apiBaseUrl = "http://localhost:8080";
+
+        // Fetch and display all leaves
+        async function loadLeaves() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/leaves`);
+                if (!response.ok) throw new Error("Failed to fetch leaves.");
+                const leaves = await response.json();
+
+                const tableBody = document.getElementById("leaveTableBody");
+                tableBody.innerHTML = leaves.map(leave => `
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left">${leave.employeeName}</td>
+                        <td class="py-3 px-6 text-left">${leave.type}</td>
+                        <td class="py-3 px-6 text-left">${leave.startDate}</td>
+                        <td class="py-3 px-6 text-left">${leave.endDate}</td>
+                        <td class="py-3 px-6 text-left">${leave.reason}</td>
+                        <td class="py-3 px-6 text-center">${leave.status}</td>
+                        <td class="py-3 px-6 text-center">
+                            ${leave.status === "Pending" ? `
+                                <button
+                                    onclick="approveLeave(${leave.id})"
+                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Approve
+                                </button>
+                                <button
+                                    onclick="rejectLeave(${leave.id})"
+                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                >
+                                    Reject
+                                </button>
+                            ` : `
+                                <span class="text-gray-500">${leave.status}</span>
+                            `}
+                        </td>
+                    </tr>
+                `).join("");
+            } catch (error) {
+                console.error(error);
+                swal("Error", "Unable to load leaves. Please try again later.", "error");
+            }
+        }
+
+        // Update leave status
+        async function approveLeave(leaveId) {
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/leaves/approveLeave/${leaveId}`, {
+                method: "POST",
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+
+            const result = await response.text();
+            swal("Success", result, "success");
+            // Optionally refresh the leave list or update the UI
+            loadLeaves(); // Reload leaves to reflect the updated status
+        } catch (error) {
+            swal("Error", error.message, "error");
+        }
+        }
+
+<!--        async function rejectLeave(leaveId) {-->
+<!--        try {-->
+<!--            const response = await fetch(`http://localhost:8080/api/leaves/rejectLeave/${leaveId}`, {-->
+<!--                method: "POST",-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                const errorText = await response.text();-->
+<!--                throw new Error(errorText);-->
+<!--            }-->
+
+<!--            const result = await response.text();-->
+<!--            swal("Success", result, "success");-->
+<!--            // Optionally refresh the leave list or update the UI-->
+<!--            loadLeaves(); // Reload leaves to reflect the updated status-->
+<!--        } catch (error) {-->
+<!--            swal("Error", error.message, "error");-->
+<!--        }-->
+<!--    }-->
+
+        async function rejectLeave(leaveId) {
+    // Prompt user to enter a reason for rejection
+    const { value: reason } = await Swal.fire({
+        title: 'Reject Leave',
+        input: 'textarea',
+        inputLabel: 'Reason for rejection',
+        inputPlaceholder: 'Enter your reason here...',
+        inputAttributes: {
+            'aria-label': 'Reason for rejection'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        cancelButtonText: 'Cancel',
+    });
+
+    // If the user cancels or doesn't provide a reason, do nothing
+    if (!reason) {
+        Swal.fire('Cancelled', 'No reason provided. Leave rejection cancelled.', 'info');
+        return;
+    }
+
+    try {
+        // Send the rejection reason along with the leave ID to the backend
+        const response = await fetch(`http://localhost:8080/api/leaves/rejectLeave/${leaveId}`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reason }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        const result = await response.text();
+        Swal.fire('Success', result, 'success');
+        // Optionally refresh the leave list or update the UI
+        loadLeaves(); // Reload leaves to reflect the updated status
+    } catch (error) {
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+
+
+
+
+        // Load leaves on page load
+        window.onload = loadLeaves;
+
 </script>
+<script src="navbar.js"></script>
 </body>
 </html>

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee,Integer> {
@@ -15,4 +16,6 @@ public interface EmployeeRepository extends JpaRepository<Employee,Integer> {
             "AND (e.dateOfResigning IS NULL OR e.dateOfResigning >= :startDate)")
     List<Employee> findActiveEmployeesInMonth(@Param("startDate") LocalDate startDate,
                                               @Param("endDate") LocalDate endDate);
+    Optional<Employee> findByProfessionalEmail(String professionalEmail);
+
 }

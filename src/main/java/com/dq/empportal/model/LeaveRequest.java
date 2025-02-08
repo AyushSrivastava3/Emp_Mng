@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class LeaveRequest {
-    private int employeeClientInfoId; // Reference to EmployeeClientInfo
+    private int employeeId; // Reference to EmployeeClientInfo
+    private String employeeName;
     private LocalDate startDate;
     private LocalDate endDate;
     private String type;  // Example: "Paid", "Unpaid", etc.

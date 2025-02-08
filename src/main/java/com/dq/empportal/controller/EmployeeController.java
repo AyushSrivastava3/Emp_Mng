@@ -31,6 +31,13 @@ public class EmployeeController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/email/{professionalEmail}")
+    public ResponseEntity<Employee> getEmployeeByEmail(@PathVariable String professionalEmail) {
+        Optional<Employee> employee = employeeService.getEmployeeByProfessionalemail(professionalEmail);
+        return employee.map(ResponseEntity::ok)
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     // Create a new employee
     @PostMapping
     public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
@@ -52,19 +59,19 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/updateDays")
-    public ResponseEntity<Employee> updateDays(
-            @RequestParam Integer employeeId,
-            @RequestBody UpdateDaysRequest request) {
-
-        // Update the employee-client info with the provided values
-        Employee updatedInfo = employeeService.updateDays(
-                employeeId,
-                request.getLeaveDays(),
-                request.getHolidays(),
-                request.getNonBillableDays());
-        return ResponseEntity.ok(updatedInfo);
-    }
+//    @PostMapping("/updateDays")
+//    public ResponseEntity<Employee> updateDays(
+//            @RequestParam Integer employeeId,
+//            @RequestBody UpdateDaysRequest request) {
+//
+//        // Update the employee-client info with the provided values
+//        Employee updatedInfo = employeeService.updateDays(
+//                employeeId,
+//                request.getLeaveDays(),
+//                request.getHolidays(),
+//                request.getNonBillableDays());
+//        return ResponseEntity.ok(updatedInfo);
+//    }
 
     @GetMapping("/employees/active")
     public List<Employee> getActiveEmployeesInMonth(

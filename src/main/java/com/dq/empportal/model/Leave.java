@@ -20,20 +20,31 @@ public class Leave {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_client_info_id")
-    private EmployeeClientInfo employeeClientInfo;
+
+    private String employeeName;
+
+    @Column(nullable = false)
+    private Integer employeeId;
 
     private LocalDate startDate;
     private LocalDate endDate;
     private String type;
     private String reason;
     private String status; // "Pending", "Approved", "Rejected"
+    private String rejectionReason;
     private String approvedBy; // Approver's name or ID
     private LocalDate approvalDate;
 
     // Compute the number of days for the leave
     public int getLeaveDuration() {
-        return Period.between(startDate, endDate).getDays() + 1;  // Including both start and end date
+        if (startDate == null || endDate == null) {
+            throw new IllegalStateException("Start date and end date must not be null to calculate leave duration.");
+        }
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
+        return Period.between(startDate, endDate).getDays() + 1; // Including both start and end date
     }
 }
+
+

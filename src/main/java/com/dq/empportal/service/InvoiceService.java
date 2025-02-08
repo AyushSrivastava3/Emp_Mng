@@ -142,9 +142,12 @@ public class InvoiceService {
 
         // Generate a dynamic invoice number (Dq/{invoiceNumber})
         long invoiceCount = invoiceRepository.count(); // Get the total number of invoices
-        String invoiceNo = "DQ/PVT/" + System.currentTimeMillis(); // Uses the current timestamp in milliseconds
+//        String invoiceNo= String.format("DQ/PVT/%04d/%02d",System.currentTimeMillis(), LocalDate.now().getYear() % 100);
+//        invoice.setInvoiceNo(invoiceNo);
 
+        String invoiceNo = generateInvoiceNumber();
         invoice.setInvoiceNo(invoiceNo);
+
 
         // Set comments for the invoice
         String comments = "Invoice generated for " + yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy"));
@@ -153,8 +156,22 @@ public class InvoiceService {
         // Save the new invoice with employee-client info associations
         invoice = invoiceRepository.save(invoice);
 
-        return invoice;
+        return invoiceRepository.save(invoice);
     }
+
+
+    private synchronized String generateInvoiceNumber() {
+        // Fetch the current invoice sequence
+        Long currentSequence = invoiceRepository.findMaxInvoiceSequence()
+                .orElse(0L); // Assuming a method to fetch the max sequence from DB
+        Long newSequence = currentSequence + 1;
+
+        // Update the sequence back to the DB (in a thread-safe manner, if required)
+
+        // Format the sequence into the invoice number
+        return String.format("DQ/PVT/%04d/%02d", newSequence, LocalDate.now().getYear() % 100);
+    }
+
 
 //    private Double calculateTotalInvoiceAmount(List<EmployeeClientInfo> employees, LocalDate startDate, LocalDate endDate) {
 //        double total = 0;
@@ -982,10 +999,30 @@ public class InvoiceService {
             // Section: Total Amount After GST with Bank Details
             Table totalAfterGstSection = new Table(UnitValue.createPercentArray(new float[]{1, 1}))
                     .setWidth(UnitValue.createPercentValue(100))
-                    .setBorder(new SolidBorder(1))
+                    .setBorder(new SolidBorder(ColorConstants.BLUE, 1))
                     .setMarginTop(10);
 
 // Add the Total Amount row
+//            totalAfterGstSection.addCell(new Cell()
+//                    .add(new Paragraph("Sub Total:").setFont(titleFont))
+//                    .setBorder(Border.NO_BORDER));
+//            totalAfterGstSection.addCell(new Cell()
+//                    .add(new Paragraph(invoice.getTotalAmountAfterGst()).setFont(regularFont))
+//                    .setTextAlignment(TextAlignment.RIGHT)
+//                    .setBorder(Border.NO_BORDER));
+//
+//
+//            // Add "Amount in Words" row
+//            totalAfterGstSection.addCell(new Cell()
+//                    .add(new Paragraph("Amount in Words:").setFont(titleFont))
+//                    .setBorder(Border.NO_BORDER));
+//
+//            totalAfterGstSection.addCell(new Cell()
+//                    .add(new Paragraph(invoice.getTotalAmountAfterGstInWords().toUpperCase() + " ONLY").setFont(regularFont))
+//                            .setBold()
+//                    .setTextAlignment(TextAlignment.RIGHT)
+//                    .setBorder(Border.NO_BORDER));
+
             totalAfterGstSection.addCell(new Cell()
                     .add(new Paragraph("Sub Total:").setFont(titleFont))
                     .setBorder(Border.NO_BORDER));
@@ -994,17 +1031,24 @@ public class InvoiceService {
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setBorder(Border.NO_BORDER));
 
-
-            // Add "Amount in Words" row
+// Add "Amount in Words" row
             totalAfterGstSection.addCell(new Cell()
                     .add(new Paragraph("Amount in Words:").setFont(titleFont))
                     .setBorder(Border.NO_BORDER));
-
             totalAfterGstSection.addCell(new Cell()
                     .add(new Paragraph(invoice.getTotalAmountAfterGstInWords().toUpperCase() + " ONLY").setFont(regularFont))
-                            .setBold()
+                    .setBold()
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setBorder(Border.NO_BORDER));
+
+// Add a border line after the money-related rows
+            totalAfterGstSection.addCell(new Cell(1, 2) // Span the cell across both columns
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1))
+                    .setBorderTop(new SolidBorder(ColorConstants.BLACK, 1)) // Add a solid top border
+                    .setBorderLeft(Border.NO_BORDER) // Remove left border
+                    .setBorderRight(Border.NO_BORDER) // Remove right border
+                    .setBorderBottom(Border.NO_BORDER) // Remove bottom border
+                    .setHeight(10));
 
 // Add the Bank Details row
             Cell bankDetailsCell = new Cell(1, 2) // Span across two columns

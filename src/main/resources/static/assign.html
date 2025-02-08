@@ -127,7 +127,7 @@
 <!--    async function fetchClientsAndEmployees() {-->
 <!--        try {-->
 <!--            // Fetch clients-->
-<!--            const clientResponse = await fetch('http://3.6.108.76:8080/api/clients');-->
+<!--            const clientResponse = await fetch('http://localhost:8080/api/clients');-->
 <!--            const clients = await clientResponse.json();-->
 <!--            const clientSelect = document.getElementById('clientSelect');-->
 <!--            clients.forEach(client => {-->
@@ -138,7 +138,7 @@
 <!--            });-->
 
 <!--            // Fetch employees-->
-<!--            const employeeResponse = await fetch('http://3.6.108.76:8080/employees');-->
+<!--            const employeeResponse = await fetch('http://localhost:8080/employees');-->
 <!--            const employees = await employeeResponse.json();-->
 <!--            const employeeSelect = document.getElementById('employeeSelect');-->
 <!--            employees.forEach(employee => {-->
@@ -165,7 +165,7 @@
 <!--        const endDate = document.getElementById('endDate').value;-->
 
 <!--        try {-->
-<!--            const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/${clientId}/assign-employee/${employeeId}`, {-->
+<!--            const response = await fetch(`http://localhost:8080/employeeClientInfo/${clientId}/assign-employee/${employeeId}`, {-->
 <!--                method: 'POST',-->
 <!--                headers: {-->
 <!--                    'Content-Type': 'application/x-www-form-urlencoded',-->
@@ -223,7 +223,7 @@ fetch('footer.html')
 async function fetchClientsAndEmployees() {
     try {
         // Fetch clients
-        const clientResponse = await fetch('http://3.6.108.76:8080/api/clients');
+        const clientResponse = await fetch('http://localhost:8080/api/clients');
         const clients = await clientResponse.json();
         const clientSelect = document.getElementById('clientSelect');
         clients.forEach(client => {
@@ -234,7 +234,7 @@ async function fetchClientsAndEmployees() {
         });
 
         // Fetch employees
-        const employeeResponse = await fetch('http://3.6.108.76:8080/employees');
+        const employeeResponse = await fetch('http://localhost:8080/employees');
         const employees = await employeeResponse.json();
         const employeeSelect = document.getElementById('employeeSelect');
         employees.forEach(employee => {
@@ -261,7 +261,7 @@ async function handleFormSubmit(event) {
     const endDate = document.getElementById('endDate').value;
 
     try {
-        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/${clientId}/assign-employee/${employeeId}`, {
+        const response = await fetch(`http://localhost:8080/employeeClientInfo/${clientId}/assign-employee/${employeeId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

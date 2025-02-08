@@ -186,7 +186,7 @@ footer {
         });
     // Fetch invoices and populate the table
 <!--    document.addEventListener("DOMContentLoaded", function() {-->
-<!--        axios.get('http://3.6.108.76:8080/api/invoices') // Endpoint to get invoices-->
+<!--        axios.get('http://localhost:8080/api/invoices') // Endpoint to get invoices-->
 <!--            .then(response => {-->
 <!--                const invoices = response.data; // List of InvoiceDto-->
 <!--                const tbody = document.getElementById('invoice-table-body');-->
@@ -316,7 +316,7 @@ footer {
 <!--                    }).then((result) => {-->
 <!--                        if (result.isConfirmed) {-->
 <!--                            // Send the update request-->
-<!--                            axios.put(`http://3.6.108.76:8080/api/invoices/${invoiceId}`, {-->
+<!--                            axios.put(`http://localhost:8080/api/invoices/${invoiceId}`, {-->
 
 <!--                                invoiceNo: invoiceNo,-->
 <!--                                clientName: clientName,-->
@@ -368,7 +368,7 @@ function toggleEditMode(row, isEditable) {
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        axios.get('http://3.6.108.76:8080/api/invoices') // Fetch invoices
+        axios.get('http://localhost:8080/api/invoices') // Fetch invoices
             .then(response => {
                 const invoices = response.data; // List of invoices
                 const tbody = document.getElementById('invoice-table-body');
@@ -471,7 +471,7 @@ function toggleEditMode(row, isEditable) {
                 updatedData['status'] = statusDropdown.value;
 
                 // Send the update request
-                axios.put(`http://3.6.108.76:8080/api/invoices/${invoiceId}`, updatedData)
+                axios.put(`http://localhost:8080/api/invoices/${invoiceId}`, updatedData)
                     .then(response => {
                         Swal.fire('Updated!', 'Invoice has been updated successfully.', 'success');
                         toggleEditMode(row, false);
@@ -500,7 +500,7 @@ function toggleEditMode(row, isEditable) {
         });
 
         if (confirmation.isConfirmed) {
-            const response = await fetch(`http://3.6.108.76:8080/api/invoices/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/invoices/${id}`, {
                 method: 'DELETE'
             });
 
@@ -544,7 +544,7 @@ function toggleEditMode(row, isEditable) {
 }
 
     document.addEventListener("DOMContentLoaded", function () {
-    axios.get('http://3.6.108.76:8080/api/invoices') // Fetch invoices from the API
+    axios.get('http://localhost:8080/api/invoices') // Fetch invoices from the API
         .then(response => {
             const invoices = response.data; // List of InvoiceDto
 
@@ -598,7 +598,7 @@ function toggleEditMode(row, isEditable) {
         .catch(error => console.error("Error fetching invoices:", error));
 });
     function fetchTotalAmounts() {
-        fetch('http://3.6.108.76:8080/api/invoices/invoices/total-amounts')
+        fetch('http://localhost:8080/api/invoices/invoices/total-amounts')
             .then(response => response.json())
             .then(data => {
                 // Update the total paid and pending amounts

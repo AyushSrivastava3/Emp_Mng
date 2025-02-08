@@ -1,11 +1,13 @@
 package com.dq.empportal.model;
 
+import com.dq.empportal.dtos.ClientInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,7 +23,9 @@ public class Employee {
     private String lastName;
     private String mobileNumber;
     private String alternateMobileNumber;
+    @Column(unique = true, nullable = false)
     private String personalEmail;
+    @Column(unique = true, nullable = false)
     private String professionalEmail;
     private LocalDate dateOfJoining;
     private LocalDate dateOfResigning;
@@ -71,22 +75,29 @@ public class Employee {
     private LocalDate laptopReceivedDate;
     private String laptopBills;
 
+    // Assigned Details
+
+//    private List<Map<Integer,String>> assignedToClients = new ArrayList<>();
+@ElementCollection
+@CollectionTable(name = "employee_client_assignments", joinColumns = @JoinColumn(name = "employee_id"))
+private List<ClientInfo> assignedToClients = new ArrayList<>();
+
     private String employeeCreatedBy;
     private String employeeUpdatedBy;
 
 
     @ElementCollection
-    private List<LocalDate> leaveDays = new ArrayList<>();
+    private List<Leave> leaveDays = new ArrayList<>();
     @ElementCollection
     private List<LocalDate> holidays = new ArrayList<>(); // Store holidays as a list of dates
     @ElementCollection
     private List<LocalDate> nonBillableDays = new ArrayList<>();
 
-    public int getLeaveDaysWithinPeriod(LocalDate startDate, LocalDate endDate) {
-        return (int) leaveDays.stream()
-                .filter(date -> !date.isBefore(startDate) && !date.isAfter(endDate))
-                .count();
-    }
+//    public int getLeaveDaysWithinPeriod(LocalDate startDate, LocalDate endDate) {
+//        return (int) leaveDays.stream()
+//                .filter(date -> !date.isBefore(startDate) && !date.isAfter(endDate))
+//                .count();
+//    }
     public int getHolidaysWithinPeriod(LocalDate startDate, LocalDate endDate) {
         return (int) holidays.stream()
                 .filter(date -> !date.isBefore(startDate) && !date.isAfter(endDate))

@@ -140,7 +140,7 @@
     const resourcesContainer = document.getElementById('resources-container');
 
     async function fetchClients() {
-        const response = await fetch('http://3.6.108.76:8080/api/clients');
+        const response = await fetch('http://localhost:8080/api/clients');
         const clients = await response.json();
         clientSelect.innerHTML = '<option value="">Select a client</option>';
         clients.forEach(client => {
@@ -160,7 +160,7 @@
             return;
         }
 
-        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/employeesForClientInMonth?clientId=${clientId}&yearMonth=${yearMonth}`);
+        const response = await fetch(`http://localhost:8080/employeeClientInfo/employeesForClientInMonth?clientId=${clientId}&yearMonth=${yearMonth}`);
         if (response.ok) {
             const resources = await response.json();
             renderResources(resources);
@@ -218,7 +218,7 @@
         const row = document.querySelector(`tr[data-resource-id="${resourceId}"]`);
         const leaveDays = row.querySelector('.leave-day-picker')._flatpickr.selectedDates.map(getLocalDate);
 
-        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/updateDays?infoId=${resourceId}`, {
+        const response = await fetch(`http://localhost:8080/employeeClientInfo/updateDays?infoId=${resourceId}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({leaveDays})
@@ -236,7 +236,7 @@
         const row = document.querySelector(`tr[data-resource-id="${resourceId}"]`);
         const leaveDaysToRemove = row.querySelector('.leave-day-picker')._flatpickr.selectedDates.map(getLocalDate);
 
-        const response = await fetch(`http://3.6.108.76:8080/employeeClientInfo/removeDays?infoId=${resourceId}`, {
+        const response = await fetch(`http://localhost:8080/employeeClientInfo/removeDays?infoId=${resourceId}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({daysToRemove: leaveDaysToRemove})

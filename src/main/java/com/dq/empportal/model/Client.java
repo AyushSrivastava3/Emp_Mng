@@ -37,4 +37,5 @@ public class Client {
     @JsonIgnore
     private List<EmployeeClientInfo> resources = new ArrayList<>();
 
+
 }
