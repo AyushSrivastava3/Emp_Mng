@@ -43,11 +43,7 @@ public class EmployeeService {
         return employeeRepository.findById(id);
     }
 
-//    public Employee createEmployee(Employee employee) {
-//        Employee employee1=employeeRepository.save(employee);
-//
-//        return employee1;
-//    }
+
 private static final PasswordEncoder passwordencoder=new BCryptPasswordEncoder();
 
 
