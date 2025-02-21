@@ -1,10 +1,17 @@
 package com.dq.empportal.service;
+import com.dq.empportal.enums.Role;
 import com.dq.empportal.model.Employee;
+import com.dq.empportal.model.User;
 import com.dq.empportal.repository.ClientRepository;
 import com.dq.empportal.repository.EmployeeRepository;
+import com.dq.empportal.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -17,6 +24,14 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private EmailNotificationService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
    // Inject the sequence generator
 
@@ -28,10 +43,56 @@ public class EmployeeService {
         return employeeRepository.findById(id);
     }
 
-    public Employee createEmployee(Employee employee) {
-        Employee employee1=employeeRepository.save(employee);
+//    public Employee createEmployee(Employee employee) {
+//        Employee employee1=employeeRepository.save(employee);
+//
+//        return employee1;
+//    }
+private static final PasswordEncoder passwordencoder=new BCryptPasswordEncoder();
 
-        return employee1;
+
+    @Transactional
+    public Employee createEmployee(Employee employee) throws MessagingException {
+        // Generate username and password
+        String username = generateUsername(employee.getPersonalEmail());
+        String rawPassword = generateRandomPassword();
+        String encodedPassword = passwordencoder.encode(rawPassword);
+
+        // Save Employee
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        // Create and save User
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(employee.getProfessionalEmail());
+        user.setPassword(encodedPassword); // Save encoded password
+        user.setRole(Role.EMPLOYEE);
+        userRepository.save(user);
+
+        // Send Email
+        String emailBody = "Dear " + employee.getFirstName() + ",\n\n"
+                + "Welcome to Digiquad Solutions! 🎉\n\n"
+                + "We are excited to have you on board. Below are your login credentials for our company portal:\n\n"
+                + "🔹 **Username: " + username + "\n"
+                + "🔹 **Password: " + rawPassword + "\n\n"
+                + "🔹 **EmailId: " + employee.getProfessionalEmail() + "\n\n"
+                + "📌 You can log in here: [Company Portal](http://localhost:8080/login.html)\n\n"
+                + "For security reasons, we recommend changing your password after your first login.\n\n"
+                + "If you have any questions, feel free to reach out.\n\n"
+                + "**Regards,**\n"
+                + "**HR Team, Digiquad Solutions**";
+
+        emailService.sendEmail(employee.getPersonalEmail(), "Your Account Credentials", emailBody);
+
+        return savedEmployee;
+    }
+
+    private String generateUsername(String email) {
+        return email.split("@")[0]; // Example: Extract username from email
+    }
+
+    private String generateRandomPassword() {
+        return "Temp@1234"; // Replace with secure password generator
     }
 
     public Employee updateEmployee(Integer id, Employee employeeDetails) {

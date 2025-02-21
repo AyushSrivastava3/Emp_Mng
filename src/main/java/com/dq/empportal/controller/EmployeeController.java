@@ -2,6 +2,7 @@ package com.dq.empportal.controller;
 import com.dq.empportal.model.Employee;
 import com.dq.empportal.service.EmployeeService;
 import com.dq.empportal.dtos.UpdateDaysRequest;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class EmployeeController {
 
     // Create a new employee
     @PostMapping
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) throws MessagingException {
         Employee createdEmployee = employeeService.createEmployee(employee);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
     }

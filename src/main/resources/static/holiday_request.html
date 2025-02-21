@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Requests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+  height: 100%; /* Ensure full height */
+  margin: 0; /* Remove default margins */
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Make the body a flex container */
+}
+
+.container {
+  flex-grow: 1; /* Allow the content to expand and fill available space */
+}
+
+footer {
+            margin-top: auto;
+        }
+       /* Stylish spinner container */
+        .spinner-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            z-index: 1000;
+        }
+
+        /* Modern Stylish Spinner */
+        .stylish-spinner {
+            width: 64px;
+            height: 64px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5; /* Indigo-500 from Tailwind */
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite, pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Spinner Animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Pulsating effect */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(79, 70, 229, 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 ">
+<div id="navbar"></div>
+<!-- Spinner Container -->
+<div id="spinner-container" class="spinner-container">
+    <div class="stylish-spinner"></div>
+</div>
+<div class="w-full mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4">Holiday Requests</h2>
+
+    <!-- Search/Filter -->
+    <div class="mb-4">
+        <input type="text" id="searchInput" placeholder="Search by Email"
+               class="p-2 border rounded w-full" onkeyup="filterRequests()">
+    </div>
+
+    <!-- Holiday Requests Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse bg-white shadow-md rounded-lg">
+            <thead class="bg-gray-200">
+            <tr>
+                <th class="p-3 text-left">Request ID</th>
+                <th class="p-3 text-left">Employee Email</th>
+                <th class="p-3 text-left">Holiday Date</th>
+                <th class="p-3 text-left">Status</th>
+                <th class="p-3 text-left">Manager Remarks</th>
+                <th class="p-3 text-left">Actions</th>
+            </tr>
+            </thead>
+            <tbody id="holidayRequestsTable">
+            <!-- Dynamic Data Fetched from API -->
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer id="footer"></footer>
+<script>
+    // Show the spinner for a few seconds while loading content
+    document.addEventListener("DOMContentLoaded", function() {
+        // Simulate content loading with a timeout
+        setTimeout(function() {
+            document.getElementById("spinner-container").style.display = "none";  // Hide spinner after loading
+        }, 1100); // Adjust the delay based on your requirements
+    });
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar').innerHTML = data;
+        });
+
+    fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('footer').innerHTML = data;
+        });
+    async function fetchHolidayRequests() {
+        try {
+            const response = await fetch("http://localhost:8080/api/holidays/requests");
+            const data = await response.json();
+
+            let tableBody = document.getElementById("holidayRequestsTable");
+            tableBody.innerHTML = "";
+
+            data.forEach(request => {
+                const statusClass = request.status === "APPROVED" ? "bg-green-200 text-green-800" :
+                                    request.status === "REJECTED" ? "bg-red-200 text-red-800" :
+                                    "bg-yellow-200 text-yellow-800";
+
+                let row = `
+                    <tr class="border-b">
+                        <td class="p-3">${request.id}</td>
+                        <td class="p-3">${request.employee.professionalEmail}</td>
+                        <td class="p-3">${request.holidayDate}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-1 rounded ${statusClass}">${request.status}</span>
+                        </td>
+                        <td class="p-3">${request.managerRemarks || "N/A"}</td>
+                        <td class="p-3">
+                            <button class="bg-green-500 text-white px-3 py-1 rounded mr-2" onclick="approveHoliday(${request.id}, true)">Approve</button>
+                            <button class="bg-red-500 text-white px-3 py-1 rounded" onclick="approveHoliday(${request.id}, false)">Reject</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error("Error fetching holiday requests:", error);
+        }
+    }
+
+    function filterRequests() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let rows = document.querySelectorAll("#holidayRequestsTable tr");
+
+        rows.forEach(row => {
+            let emailCell = row.cells[1].textContent.toLowerCase();
+            row.style.display = emailCell.includes(input) ? "" : "none";
+        });
+    }
+
+    async function approveHoliday(requestId, isApproved) {
+        let managerRemarks = prompt("Enter remarks (optional):") || "";
+        try {
+            const response = await fetch(`http://localhost:8080/api/holidays/approve/${requestId}?isApproved=${isApproved}&managerRemarks=${encodeURIComponent(managerRemarks)}`, {
+                method: "POST"
+            });
+
+            if (response.ok) {
+                alert(`Holiday request has been ${isApproved ? "APPROVED" : "REJECTED"}`);
+                fetchHolidayRequests();  // Refresh the table
+            } else {
+                alert("Failed to process the request.");
+            }
+        } catch (error) {
+            console.error("Error approving holiday:", error);
+        }
+    }
+
+    // Fetch holiday requests on page load
+    fetchHolidayRequests();
+</script>
+<script src="navbar.js"></script>
+</body>
+</html>

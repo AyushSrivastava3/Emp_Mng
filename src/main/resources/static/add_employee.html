@@ -150,6 +150,10 @@
                     <input type="text" id="managerName" class="w-full p-2 border rounded">
                 </div>
                 <div>
+                    <label for="managerName" class="block">Manager Email</label>
+                    <input type="text" id="managerEmail" class="w-full p-2 border rounded">
+                </div>
+                <div>
                     <label for="employmentType" class="block">Employment Type</label>
                     <input type="text" id="employmentType" class="w-full p-2 border rounded">
                 </div>
@@ -361,6 +365,8 @@
   jobTitle: document.getElementById('jobTitle') ? document.getElementById('jobTitle').value : '',
   department: document.getElementById('department') ? document.getElementById('department').value : '',
   managerName: document.getElementById('managerName') ? document.getElementById('managerName').value : '',
+  managerEmail: document.getElementById('managerEmail') ? document.getElementById('managerEmail').value : '',
+
   employmentType: document.getElementById('employmentType') ? document.getElementById('employmentType').value : '',
   employeeStatus: document.getElementById('employeeStatus') ? document.getElementById('employeeStatus').value : '',
   workLocation: document.getElementById('workLocation') ? document.getElementById('workLocation').value : '',

@@ -42,6 +42,7 @@ public class Employee {
     private String jobTitle;
     private String department;
     private String managerName;
+    private String managerEmail;
     private String employmentType;
     private String employeeStatus;
     private String workLocation;
