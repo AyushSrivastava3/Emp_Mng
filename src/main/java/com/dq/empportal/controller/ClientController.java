@@ -55,6 +55,9 @@ public class ClientController {
         if (clientDetails.getClientAddress() != null) {
             client.setClientAddress(clientDetails.getClientAddress());
         }
+        if (clientDetails.getClientCountry() != null) {
+            client.setClientCountry(clientDetails.getClientCountry());
+        }
         if (clientDetails.getGstNumber() != null) {
             client.setGstNumber(clientDetails.getGstNumber());
         }

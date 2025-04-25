@@ -14,6 +14,25 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "Employee.find_active_employees_in_month",
+                procedureName = "find_active_employees_in_month",
+                resultClasses = Employee.class,
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = LocalDate.class, name = "startDate"),
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = LocalDate.class, name = "endDate")
+                }
+        ),
+        @NamedStoredProcedureQuery(
+                name = "Employee.find_employee_by_email",
+                procedureName = "find_employee_by_email",
+                resultClasses = Employee.class,
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "email")
+                }
+        )
+})
 public class Employee {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

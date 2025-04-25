@@ -174,14 +174,15 @@ private static final PasswordEncoder passwordencoder=new BCryptPasswordEncoder()
 //        return employeeRepository.save(info);
 //    }
 
-
+    @Transactional()
     public List<Employee> getActiveEmployeesInMonth(int year, int month) {
         // Calculate the first and last day of the month
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate startDate = yearMonth.atDay(1);  // First day of the month
         LocalDate endDate = yearMonth.atEndOfMonth();  // Last day of the month
 
-        return employeeRepository.findActiveEmployeesInMonth(startDate, endDate);
+//        return employeeRepository.findActiveEmployeesInMonth(startDate, endDate);
+        return employeeRepository.getActiveEmployeesInMonth(startDate,endDate);
     }
 
     public Employee removeDays(Integer employeeId, List<LocalDate> leaveDaysToRemove, List<LocalDate> holidaysToRemove, List<LocalDate> nonBillableDaysToRemove) {
@@ -206,6 +207,7 @@ private static final PasswordEncoder passwordencoder=new BCryptPasswordEncoder()
         return employeeRepository.save(info);
     }
 
+    @Transactional()
     public Optional<Employee> getEmployeeByProfessionalemail(String email) {
         return employeeRepository.findByProfessionalEmail(email);
     }

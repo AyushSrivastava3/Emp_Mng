@@ -4,6 +4,7 @@
 //import com.dq.empportal.model.Employee;
 //import com.dq.empportal.repository.ClientRepository;
 //import com.dq.empportal.repository.EmployeeRepository;
+//import jakarta.mail.MessagingException;
 //import jakarta.persistence.EntityNotFoundException;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@
 //    }
 //
 //    @Test
-//    void testCreateEmployee() {
+//    void testCreateEmployee() throws MessagingException {
 //        Employee employee = new Employee();
 //        when(employeeRepository.save(employee)).thenReturn(employee);
 //
@@ -95,33 +96,5 @@
 //        verify(employeeRepository, times(1)).deleteById(1);
 //    }
 //
-////    @Test
-////    void testUpdateDays() {
-////        Employee employee = new Employee();
-////        employee.setLeaveDays(new ArrayList<>(List.of(LocalDate.of(2024, 1, 1))));
-////        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
-////        when(employeeRepository.save(employee)).thenReturn(employee);
-////
-////        List<LocalDate> newLeaveDays = List.of(LocalDate.of(2024, 1, 2));
-////        Employee result = employeeService.updateDays(1, newLeaveDays, null, null);
-////
-////        assertEquals(2, result.getLeaveDays().size());
-////        verify(employeeRepository, times(1)).save(employee);
-////    }
-////
-////    @Test
-////    void testRemoveDays() {
-////        Employee employee = new Employee();
-////        employee.setLeaveDays(new ArrayList<>(List.of(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 2))));
-////        when(employeeRepository.findById(1)).thenReturn(Optional.of(employee));
-////        when(employeeRepository.save(employee)).thenReturn(employee);
-////
-////        List<LocalDate> leaveDaysToRemove = List.of(LocalDate.of(2024, 1, 2));
-////        Employee result = employeeService.removeDays(1, leaveDaysToRemove, null, null);
-////
-////        assertEquals(1, result.getLeaveDays().size());
-////        assertFalse(result.getLeaveDays().contains(LocalDate.of(2024, 1, 2)));
-////        verify(employeeRepository, times(1)).save(employee);
-////    }
 //
 //}
